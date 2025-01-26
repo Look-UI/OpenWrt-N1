@@ -27,14 +27,12 @@ rm -rf feeds/luci/themes/luci-theme-argon
 # git clone https://github.com/jerrykuku/luci-app-argon-config.git package/luci-app-argon-config
 # git clone https://github.com/jerrykuku/luci-theme-argon.git package/luci-theme-argon
 
-git clone --depth 1 https://github.com/kenzok78/luci-app-argone-config.git                        # Argon主题设置
-git clone --depth 1 https://github.com/kenzok78/luci-theme-argone.git                             # Argon主题
 
 # 修改主题配置
-sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci/Makefile
-sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci-light/Makefile
-sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci-nginx/Makefile
-sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci-ssl-nginx/Makefile
+sed -i 's/luci-theme-bootstrap/luci-theme-argone/g' feeds/luci/collections/luci/Makefile
+sed -i 's/luci-theme-bootstrap/luci-theme-argone/g' feeds/luci/collections/luci-light/Makefile
+sed -i 's/luci-theme-bootstrap/luci-theme-argone/g' feeds/luci/collections/luci-nginx/Makefile
+sed -i 's/luci-theme-bootstrap/luci-theme-argone/g' feeds/luci/collections/luci-ssl-nginx/Makefile
 
 # 更改Argon主题背景
 cp -f $GITHUB_WORKSPACE/images/bg1.jpg package/luci-theme-argone/htdocs/luci-static/argon/img/bg1.jpg
@@ -71,8 +69,8 @@ mv -f package-temp/luci-app-amlogic/luci-app-amlogic package/lean/
 rm -rf package-temp
 
 # NPS内网穿透
-git clone https://github.com/yhl452493373/npc.git package/npc
-git clone https://github.com/yhl452493373/luci-app-npc.git package/luci-app-npc
+# git clone https://github.com/yhl452493373/npc.git package/npc
+# git clone https://github.com/yhl452493373/luci-app-npc.git package/luci-app-npc
 
 # 调整终端到系统菜单
 sed -i 's/services/system/g' feeds/luci/applications/luci-app-ttyd/root/usr/share/luci/menu.d/luci-app-ttyd.json
