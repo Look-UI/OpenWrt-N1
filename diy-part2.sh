@@ -37,8 +37,8 @@ sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci-n
 sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci-ssl-nginx/Makefile
 
 # 更改Argon主题背景
-cp -f $GITHUB_WORKSPACE/images/bg1.jpg package/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
-rm -rf theme-temp/luci-theme-argon/README.md
+cp -f $GITHUB_WORKSPACE/images/bg1.jpg package/luci-theme-argone/htdocs/luci-static/argon/img/bg1.jpg
+rm -rf theme-temp/luci-theme-argone/README.md
 
 ########### 更改默认主题（可选）###########
 
