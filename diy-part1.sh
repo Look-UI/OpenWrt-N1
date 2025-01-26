@@ -17,11 +17,13 @@
 # Add a feed source
 #echo 'src-git helloworld https://github.com/fw876/helloworld' >>feeds.conf.default
 echo 'src-git passwall https://github.com/xiaorouji/openwrt-passwall' >>feeds.conf.default
+echo 'src-git fichenx https://github.com/fichenx/openwrt-package' >>feeds.conf.default
 
 ## 常用OpenWrt软件包源码合集，同步上游更新！
 ## 通用版luci适合18.06与19.07
 sed -i 'src-git kenzo https://github.com/kenzok8/openwrt-packages' feeds.conf.default
 sed -i 'src-git small https://github.com/kenzok8/small' feeds.conf.default
+
 
 ./scripts/feeds update -a && rm -rf feeds/luci/applications/luci-app-mosdns
 rm -rf feeds/packages/lang/golang
