@@ -21,7 +21,7 @@ sed -i 's/192.168.1.1/192.168.1.101/g' package/base-files/image-config.in
 
 ########### 更改默认主题（可选）###########
 # 删除主题
-rm -rf feeds/luci/themes/luci-theme-argon
+# rm -rf feeds/luci/themes/luci-theme-argon
 
 # 拉取 argone 源码
 # git clone https://github.com/jerrykuku/luci-app-argon-config.git package/luci-app-argon-config
@@ -29,14 +29,14 @@ rm -rf feeds/luci/themes/luci-theme-argon
 
 
 # 修改主题配置
-sed -i 's/luci-theme-bootstrap/luci-theme-argone/g' feeds/luci/collections/luci/Makefile
-sed -i 's/luci-theme-bootstrap/luci-theme-argone/g' feeds/luci/collections/luci-light/Makefile
-sed -i 's/luci-theme-bootstrap/luci-theme-argone/g' feeds/luci/collections/luci-nginx/Makefile
-sed -i 's/luci-theme-bootstrap/luci-theme-argone/g' feeds/luci/collections/luci-ssl-nginx/Makefile
+sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci/Makefile
+sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci-light/Makefile
+sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci-nginx/Makefile
+sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci-ssl-nginx/Makefile
 
 # 更改Argon主题背景
-cp -f $GITHUB_WORKSPACE/images/bg1.jpg package/luci-theme-argone/htdocs/luci-static/argon/img/bg1.jpg
-rm -rf theme-temp/luci-theme-argone/README.md
+cp -f $GITHUB_WORKSPACE/images/bg1.jpg package/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
+rm -rf theme-temp/luci-theme-argon/README.md
 
 ########### 更改默认主题（可选）###########
 
