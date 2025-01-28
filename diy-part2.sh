@@ -21,11 +21,11 @@ sed -i 's/192.168.1.1/192.168.1.101/g' package/base-files/image-config.in
 
 ########### 更改默认主题（可选）###########
 # 删除主题
-rm -rf feeds/luci/themes/luci-theme-argon
+# rm -rf feeds/luci/themes/luci-theme-argon
 
 # 拉取 argone 源码
-git clone https://github.com/jerrykuku/luci-theme-argon.git luci-theme-argon
-git clone https://github.com/jerrykuku/luci-theme-argon.git package/luci-theme-argon
+# git clone https://github.com/jerrykuku/luci-theme-argon.git luci-theme-argon
+# git clone https://github.com/jerrykuku/luci-theme-argon.git package/luci-theme-argon
 
 
 # 修改主题配置
