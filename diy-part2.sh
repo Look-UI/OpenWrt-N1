@@ -24,8 +24,8 @@ sed -i 's/192.168.1.1/192.168.1.101/g' package/base-files/image-config.in
 rm -rf feeds/luci/themes/luci-theme-argon
 
 # 拉取 argone 源码
-git clone --depth 1 https://github.com/jerrykuku/luci-theme-argon
-git clone --depth 1 https://github.com/jerrykuku/luci-app-argon-config
+git clone --depth 1 -b 18.06 https://github.com/jerrykuku/luci-theme-argon package/luci-theme-argon
+git clone --depth 1 https://github.com/jerrykuku/luci-app-argon-config package/luci-app-argon-config
 
 
 # 修改主题配置
