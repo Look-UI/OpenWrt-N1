@@ -21,11 +21,10 @@ source $GITHUB_WORKSPACE/diy_script/function.sh
 # ttyd自动登录
 sed -i "s?/bin/login?/usr/libexec/login.sh?g" feeds/packages/utils/ttyd/files/ttyd.config
 
-# Modify default IP
+# 修改默认IP
 sed -i 's/192.168.1.1/192.168.1.101/g' package/base-files/files/bin/config_generate
 sed -i 's/192.168.1.1/192.168.1.101/g' package/base-files/luci2/bin/config_generate
-sed -i 's/192.168.1.1/192.168.1.101/g' package/base-files/Makefile
-sed -i 's/192.168.1.1/192.168.1.101/g' package/base-files/image-config.in
+
 
 ########### 更改默认主题（可选）###########
 # 删除主题
@@ -33,8 +32,8 @@ rm -rf package/small-package/luci-app-argon*
 rm -rf package/small-package/luci-theme-argon*
 
 # 拉取 argone 源码
-git clone --depth 1 -b 18.06 https://github.com/jerrykuku/luci-theme-argon package/luci-theme-argon
-git clone --depth 1 https://github.com/jerrykuku/luci-app-argon-config package/luci-app-argon-config
+git_clone 18.06 https://github.com/jerrykuku/luci-theme-argon
+git_clone 18.06 https://github.com/jerrykuku/luci-app-argon-config
 
 
 # 修改主题配置
