@@ -10,6 +10,14 @@
 # Description: OpenWrt DIY script part 2 (After Update feeds)
 #
 
+echo "========================="
+echo "开始 DIY2 配置……"
+echo "========================="
+
+# Git稀疏克隆，只克隆指定目录到本地
+chmod +x $GITHUB_WORKSPACE/diy_script/function.sh
+source $GITHUB_WORKSPACE/diy_script/function.sh
+
 # ttyd自动登录
 sed -i "s?/bin/login?/usr/libexec/login.sh?g" feeds/packages/utils/ttyd/files/ttyd.config
 
@@ -40,6 +48,9 @@ cp -f $GITHUB_WORKSPACE/images/bg1.jpg package/luci-theme-argon/htdocs/luci-stat
 rm -rf theme-temp/luci-theme-argon/README.md
 
 ########### 更改默认主题（可选）###########
+
+# 去除型号右侧肿瘤式跑分信息
+# sed -i "s|\ <%=luci.sys.exec(\"cat \/etc\/bench.log\") or \" \"%>||g" feeds/luci/modules/luci-mod-admin-full/luasrc/view/admin_status/index.htm
 
 # 为 armvirt 架构添加 autocore 支持
 sed -i 's/TARGET_rockchip/TARGET_rockchip\|\|TARGET_armvirt/g' package/lean/autocore/Makefile
@@ -110,5 +121,8 @@ sed -i 's/msgstr "备份与升级"/msgstr "备份\/升级"/g' feeds/luci/modules
 sed -i 's/msgstr "DHCP\/DNS"/msgstr "DHCP服务"/g' feeds/luci/modules/luci-base/po/zh_Hans/base.po
 sed -i 's/msgstr "网络存储"/msgstr "存储"/g' feeds/luci/applications/luci-app-vsftpd/po/zh_Hans/vsftpd.po
 
+./scripts/feeds update -a
+./scripts/feeds install -a
 
-
+echo "========================="
+echo " DIY2 配置完成……"
