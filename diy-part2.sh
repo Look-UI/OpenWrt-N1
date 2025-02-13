@@ -32,9 +32,10 @@ rm -rf package/small-package/luci-app-argon*
 rm -rf package/small-package/luci-theme-argon*
 
 # 拉取 argone 源码
-git_clone 18.06 https://github.com/jerrykuku/luci-theme-argon
-git_clone 18.06 https://github.com/jerrykuku/luci-app-argon-config
-
+# git_clone 18.06 https://github.com/jerrykuku/luci-theme-argon
+# git_clone 18.06 https://github.com/jerrykuku/luci-app-argon-config
+git clone --depth=1 https://github.com/sbwml/luci-theme-argon.git package/luci-theme-argon
+git clone --depth=1 https://github.com/sbwml/luci-app-argon-config.git package/luci-app-argon-config
 
 # 修改主题配置
 sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci/Makefile
@@ -111,7 +112,7 @@ sed -i 's/"实时流量监测"/"流量"/g' `grep "实时流量监测" -rl ./`
 sed -i 's/"Alist 文件列表"/"Alist"/g' `grep "Alist 文件列表" -rl ./`
 sed -i 's/"挂载点"/"磁盘挂载"/g' `grep "挂载点" -rl ./`
 sed -i 's/"Npc"/"Nps内网穿透"/g' `grep "Npc" -rl ./`
-sed -i 's/"frp 内网穿透"/"Frp内网穿透"/g' `grep "frp 内网穿透" -rl ./`
+sed -i 's/"frp 客户端"/"Frp内网穿透"/g' `grep "frp 客户端" -rl ./`
 
 # 调整部分插件名字
 sed -i '/msgid "Reboot"/{n;s/重启/重启设备/;}' feeds/luci/modules/luci-base/po/zh_Hans/base.po
