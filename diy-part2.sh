@@ -23,19 +23,16 @@ sed -i "s?/bin/login?/usr/libexec/login.sh?g" feeds/packages/utils/ttyd/files/tt
 
 # 修改默认IP
 sed -i 's/192.168.1.1/192.168.1.101/g' package/base-files/files/bin/config_generate
-sed -i 's/192.168.1.1/192.168.1.101/g' package/base-files/luci2/bin/config_generate
-
 
 ########### 更改默认主题（可选）###########
 # 删除主题
-rm -rf package/small-package/luci-app-argon*
-rm -rf package/small-package/luci-theme-argon*
+rm -rf feeds/luci/themes/luci-theme-argon
 
 # 拉取 argone 源码
 # git_clone 18.06 https://github.com/jerrykuku/luci-theme-argon
 # git_clone 18.06 https://github.com/jerrykuku/luci-app-argon-config
-git clone --depth=1 https://github.com/sbwml/luci-theme-argon.git package/luci-theme-argon
-git clone --depth=1 https://github.com/sbwml/luci-app-argon-config.git package/luci-app-argon-config
+git clone --depth 1 https://github.com/kenzok78/luci-theme-argonne
+git clone --depth 1 https://github.com/kenzok78/luci-app-argonne-config
 
 # 修改主题配置
 sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci/Makefile
@@ -43,14 +40,18 @@ sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci-l
 sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci-nginx/Makefile
 sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci-ssl-nginx/Makefile
 
-# 更改Argon主题背景
-cp -f $GITHUB_WORKSPACE/images/bg1.jpg package/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
-rm -rf theme-temp/luci-theme-argon/README.md
+# 更改Argonne主题背景
+cp -f $GITHUB_WORKSPACE/images/bg1.jpg openwrt/package/luci-theme-argone/htdocs/luci-static/argone/img/bg1.jpg
+rm -rf theme-temp/luci-theme-argonne/README.md
 
 ########### 更改默认主题（可选）###########
 
+# 修改固件名称
+sed -i 's/LEDE/OpenWrt-N1/g' openwrt/package/base-files/files/bin/config_generate
+sed -i 's/LEDE/OpenWrt-N1/g' openwrt/package/base-files/luci2/bin/config_generate
+
 # 去除型号右侧肿瘤式跑分信息
-# sed -i "s|\ <%=luci.sys.exec(\"cat \/etc\/bench.log\") or \" \"%>||g" feeds/luci/modules/luci-mod-admin-full/luasrc/view/admin_status/index.htm
+sed -i "s|\ <%=luci.sys.exec(\"cat \/etc\/bench.log\") or \" \"%>||g" feeds/luci/modules/luci-mod-admin-full/luasrc/view/admin_status/index.htm
 
 # 为 armvirt 架构添加 autocore 支持
 sed -i 's/TARGET_rockchip/TARGET_rockchip\|\|TARGET_armvirt/g' package/lean/autocore/Makefile
@@ -113,6 +114,7 @@ sed -i 's/"Alist 文件列表"/"Alist"/g' `grep "Alist 文件列表" -rl ./`
 sed -i 's/"挂载点"/"磁盘挂载"/g' `grep "挂载点" -rl ./`
 sed -i 's/"Npc"/"Nps内网穿透"/g' `grep "Npc" -rl ./`
 sed -i 's/"frp 客户端"/"Frp内网穿透"/g' `grep "frp 客户端" -rl ./`
+sed -i 's/"NPS 内网穿透客户端"/"NPS内网穿透"/g' `grep "NPS 内网穿透客户端" -rl ./`
 
 # 调整部分插件名字
 sed -i '/msgid "Reboot"/{n;s/重启/重启设备/;}' feeds/luci/modules/luci-base/po/zh_Hans/base.po
@@ -120,6 +122,17 @@ sed -i '/msgid "Startup"/{n;s/启动项/启动管理/;}' feeds/luci/modules/luci
 sed -i 's/msgstr "备份与升级"/msgstr "备份\/升级"/g' feeds/luci/modules/luci-base/po/zh_Hans/base.po
 sed -i 's/msgstr "DHCP\/DNS"/msgstr "DHCP服务"/g' feeds/luci/modules/luci-base/po/zh_Hans/base.po
 sed -i 's/msgstr "网络存储"/msgstr "存储"/g' feeds/luci/applications/luci-app-vsftpd/po/zh_Hans/vsftpd.po
+
+#将AdGuardHome核心文件编译进目录
+curl -s https://api.github.com/repos/AdguardTeam/AdGuardHome/releases/latest \
+| grep "browser_download_url.*AdGuardHome_linux_amd64.tar.gz" \
+| cut -d : -f 2,3 \
+| tr -d \" \
+| xargs curl -L -o /tmp/AdGuardHome_linux_amd64.tar.gz && \
+tar -xzvf /tmp/AdGuardHome_linux_amd64.tar.gz -C /tmp/ --strip-components=1 && \
+mkdir -p files/usr/bin/AdGuardHome && \
+mv /tmp/AdGuardHome/AdGuardHome files/usr/bin/AdGuardHome/
+chmod 0755 files/usr/bin/AdGuardHome/AdGuardHome
 
 ./scripts/feeds update -a
 ./scripts/feeds install -a
