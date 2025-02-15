@@ -22,8 +22,8 @@ source $GITHUB_WORKSPACE/diy_script/function.sh
 sed -i "s?/bin/login?/usr/libexec/login.sh?g" feeds/packages/utils/ttyd/files/ttyd.config
 
 # 修改默认IP
-sed -i 's/192.168.1.1/192.168.8.101/g' package/base-files/files/bin/config_generate
-sed -i 's/192.168.1.1/192.168.8.101/g' package/base-files/luci2/bin/config_generate
+sed -i 's/192.168.1.1/192.168.1.101/g' package/base-files/files/bin/config_generate
+sed -i 's/192.168.1.1/192.168.1.101/g' package/base-files/luci2/bin/config_generate
 
 # 修改主机名称
 sed -i "s/hostname='LEDE'/hostname='OpenWrt-N1'/g" package/base-files/files/bin/config_generate
@@ -31,11 +31,11 @@ sed -i "s/hostname='LEDE'/hostname='OpenWrt-N1'/g" package/base-files/files/bin/
 ########### 更改默认主题（可选）###########
 # 删除主题
 rm -rf feeds/luci/themes/luci-theme-argon
+rm -rf feeds/luci/applications/luci-app-argon-config
 
 # 拉取 argone或者argon 源码
 # git_clone 18.06 https://github.com/jerrykuku/luci-theme-argon
 # git_clone 18.06 https://github.com/jerrykuku/luci-app-argon-config
-
 git clone --depth 1 https://github.com/kenzok78/luci-theme-argone
 git clone --depth 1 https://github.com/kenzok78/luci-app-argone-config
 
