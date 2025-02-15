@@ -39,23 +39,29 @@ sed -i "s/hostname='LEDE'/hostname='OpenWrt-N1'/g" package/base-files/files/bin/
 rm -rf feeds/luci/themes/luci-theme-argon
 rm -rf feeds/luci/applications/luci-app-argon-config
 
-# 拉取 argone或者argon 源码
-# git_clone 18.06 https://github.com/jerrykuku/luci-theme-argon
-# git_clone 18.06 https://github.com/jerrykuku/luci-app-argon-config
-git clone --depth 1 https://github.com/kenzok78/luci-theme-argone
-git clone --depth 1 https://github.com/kenzok78/luci-app-argone-config
+# 拉取 argon 源码
+git clone https://github.com/jerrykuku/luci-theme-argon.git  package/luci-theme-argon
+git clone https://github.com/jerrykuku/luci-app-argon-config.git  package/luci-app-argon-config
 
-# 修改主题配置，根据拉取的主题进行修改
-sed -i 's/luci-theme-bootstrap/luci-theme-argone/g' feeds/luci/collections/luci/Makefile
-sed -i 's/luci-theme-bootstrap/luci-theme-argone/g' feeds/luci/collections/luci-light/Makefile
-sed -i 's/luci-theme-bootstrap/luci-theme-argone/g' feeds/luci/collections/luci-nginx/Makefile
-sed -i 's/luci-theme-bootstrap/luci-theme-argone/g' feeds/luci/collections/luci-ssl-nginx/Makefile
+# 修改主题配置
+sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci/Makefile
+sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci-light/Makefile
+sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci-nginx/Makefile
+sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci-ssl-nginx/Makefile
 
 # 更改Argonne主题背景
-cp -f $GITHUB_WORKSPACE/images/bg1.jpg openwrt/package/luci-theme-argone/htdocs/luci-static/argone/img/bg1.jpg
+cp -f $GITHUB_WORKSPACE/images/bg1.jpg openwrt/package/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
 rm -rf theme-temp/luci-theme-argone/README.md
 
 ########### 更改默认主题（可选）###########
+
+# 修改概览里时间显示为中文数字(F大打包工具会替换)
+sed -i 's/os.date()/os.date("%Y年%m月%d日") .. " " .. translate(os.date("%A")) .. " " .. os.date("%X")/g' package/lean/autocore/files/arm/index.htm
+
+# 修改主题多余版本信息
+sed -i 's|<a class="luci-link" href="https://github.com/openwrt/luci"|<a|g' feeds/luci/themes/luci-theme-argon/luasrc/view/themes/argon/footer.htm
+sed -i 's|<a href="https://github.com/jerrykuku/luci-theme-argon" target="_blank">|<a>|g' feeds/luci/themes/luci-theme-argon/luasrc/view/themes/argon/footer.htm
+sed -i 's/<a href=\"https:\/\/github.com\/coolsnowwolf\/luci\">/<a>/g' feeds/luci/themes/luci-theme-bootstrap/luasrc/view/themes/bootstrap/footer.htm
 
 # 去除型号右侧肿瘤式跑分信息
 sed -i "s|\ <%=luci.sys.exec(\"cat \/etc\/bench.log\") or \" \"%>||g" feeds/luci/modules/luci-mod-admin-full/luasrc/view/admin_status/index.htm
