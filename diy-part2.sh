@@ -15,8 +15,14 @@ echo "开始 DIY2 配置……"
 echo "========================="
 
 # Git稀疏克隆，只克隆指定目录到本地
-chmod +x $GITHUB_WORKSPACE/diy_script/function.sh
-source $GITHUB_WORKSPACE/diy_script/function.sh
+function git_sparse_clone() {
+  branch="$1" repourl="$2" && shift 2
+  git clone --depth=1 -b $branch --single-branch --filter=blob:none --sparse $repourl
+  repodir=$(echo $repourl | awk -F '/' '{print $(NF)}')
+  cd $repodir && git sparse-checkout set $@
+  mv -f $@ ../package
+  cd .. && rm -rf $repodir
+}
 
 # ttyd自动登录
 sed -i "s?/bin/login?/usr/libexec/login.sh?g" feeds/packages/utils/ttyd/files/ttyd.config
