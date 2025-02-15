@@ -22,36 +22,38 @@ source $GITHUB_WORKSPACE/diy_script/function.sh
 sed -i "s?/bin/login?/usr/libexec/login.sh?g" feeds/packages/utils/ttyd/files/ttyd.config
 
 # 修改默认IP
-sed -i 's/192.168.1.1/192.168.1.101/g' package/base-files/files/bin/config_generate
+sed -i 's/192.168.1.1/192.168.8.101/g' package/base-files/files/bin/config_generate
+sed -i 's/192.168.1.1/192.168.8.101/g' package/base-files/luci2/bin/config_generate
 
 ########### 更改默认主题（可选）###########
 # 删除主题
 rm -rf feeds/luci/themes/luci-theme-argon
 
-# 拉取 argone 源码
+# 拉取 argone或者argon 源码
 # git_clone 18.06 https://github.com/jerrykuku/luci-theme-argon
 # git_clone 18.06 https://github.com/jerrykuku/luci-app-argon-config
-git clone --depth 1 https://github.com/kenzok78/luci-theme-argonne
-git clone --depth 1 https://github.com/kenzok78/luci-app-argonne-config
 
-# 修改主题配置
-sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci/Makefile
-sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci-light/Makefile
-sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci-nginx/Makefile
-sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci-ssl-nginx/Makefile
+git clone --depth 1 https://github.com/kenzok78/luci-theme-argone
+git clone --depth 1 https://github.com/kenzok78/luci-app-argone-config
+
+
+# 修改主题配置，根据拉取的主题进行修改
+sed -i 's/luci-theme-bootstrap/luci-theme-argone/g' feeds/luci/collections/luci/Makefile
+sed -i 's/luci-theme-bootstrap/luci-theme-argone/g' feeds/luci/collections/luci-light/Makefile
+sed -i 's/luci-theme-bootstrap/luci-theme-argone/g' feeds/luci/collections/luci-nginx/Makefile
+sed -i 's/luci-theme-bootstrap/luci-theme-argone/g' feeds/luci/collections/luci-ssl-nginx/Makefile
 
 # 更改Argonne主题背景
 cp -f $GITHUB_WORKSPACE/images/bg1.jpg openwrt/package/luci-theme-argone/htdocs/luci-static/argone/img/bg1.jpg
-rm -rf theme-temp/luci-theme-argonne/README.md
+rm -rf theme-temp/luci-theme-argone/README.md
 
 ########### 更改默认主题（可选）###########
 
-# 修改固件名称
-sed -i 's/LEDE/OpenWrt-N1/g' openwrt/package/base-files/files/bin/config_generate
-sed -i 's/LEDE/OpenWrt-N1/g' openwrt/package/base-files/luci2/bin/config_generate
-
 # 去除型号右侧肿瘤式跑分信息
 sed -i "s|\ <%=luci.sys.exec(\"cat \/etc\/bench.log\") or \" \"%>||g" feeds/luci/modules/luci-mod-admin-full/luasrc/view/admin_status/index.htm
+
+# coremark跑分定时清除
+sed -i '/\* \* \* \/etc\/coremark.sh/d' feeds/packages/utils/coremark/*
 
 # 为 armvirt 架构添加 autocore 支持
 sed -i 's/TARGET_rockchip/TARGET_rockchip\|\|TARGET_armvirt/g' package/lean/autocore/Makefile
@@ -133,6 +135,15 @@ tar -xzvf /tmp/AdGuardHome_linux_amd64.tar.gz -C /tmp/ --strip-components=1 && \
 mkdir -p files/usr/bin/AdGuardHome && \
 mv /tmp/AdGuardHome/AdGuardHome files/usr/bin/AdGuardHome/
 chmod 0755 files/usr/bin/AdGuardHome/AdGuardHome
+
+# 转换插件语言翻译
+for e in $(ls -d $destination_dir/luci-*/po feeds/luci/applications/luci-*/po); do
+    if [[ -d $e/zh-cn && ! -d $e/zh_Hans ]]; then
+        ln -s zh-cn $e/zh_Hans 2>/dev/null
+    elif [[ -d $e/zh_Hans && ! -d $e/zh-cn ]]; then
+        ln -s zh_Hans $e/zh-cn 2>/dev/null
+    fi
+done
 
 ./scripts/feeds update -a
 ./scripts/feeds install -a
