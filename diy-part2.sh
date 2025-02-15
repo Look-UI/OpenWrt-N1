@@ -61,7 +61,7 @@ sed -i '/\* \* \* \/etc\/coremark.sh/d' feeds/packages/utils/coremark/*
 sed -i 's/TARGET_rockchip/TARGET_rockchip\|\|TARGET_armvirt/g' package/lean/autocore/Makefile
 
 # 设置OpenWrt 发行版的修订版本
-sed -i "s/OpenWrt /Deng Build $(TZ=UTC-8 date "+%Y.%m") @ OpenWrt /g" package/lean/default-settings/files/zzz-default-settings
+# sed -i "s/OpenWrt /Deng Build $(TZ=UTC-8 date "+%Y.%m") @ OpenWrt /g" package/lean/default-settings/files/zzz-default-settings
 
 # 设置samba4权限
 sed -i 's/invalid users = root/#invalid users = root/g' feeds/packages/net/samba4/files/smb.conf.template
