@@ -25,6 +25,9 @@ sed -i "s?/bin/login?/usr/libexec/login.sh?g" feeds/packages/utils/ttyd/files/tt
 sed -i 's/192.168.1.1/192.168.8.101/g' package/base-files/files/bin/config_generate
 sed -i 's/192.168.1.1/192.168.8.101/g' package/base-files/luci2/bin/config_generate
 
+# 修改主机名称
+sed -i "s/hostname='LEDE'/hostname='OpenWrt-N1'/g" package/base-files/files/bin/config_generate
+
 ########### 更改默认主题（可选）###########
 # 删除主题
 rm -rf feeds/luci/themes/luci-theme-argon
@@ -35,7 +38,6 @@ rm -rf feeds/luci/themes/luci-theme-argon
 
 git clone --depth 1 https://github.com/kenzok78/luci-theme-argone
 git clone --depth 1 https://github.com/kenzok78/luci-app-argone-config
-
 
 # 修改主题配置，根据拉取的主题进行修改
 sed -i 's/luci-theme-bootstrap/luci-theme-argone/g' feeds/luci/collections/luci/Makefile
