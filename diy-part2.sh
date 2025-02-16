@@ -51,7 +51,7 @@ sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci-s
 
 # 更改Argonne主题背景
 cp -f $GITHUB_WORKSPACE/images/bg1.jpg openwrt/package/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
-rm -rf theme-temp/luci-theme-argone/README.md
+rm -rf theme-temp/luci-theme-argon/README.md
 
 ########### 更改默认主题（可选）###########
 
