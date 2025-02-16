@@ -49,14 +49,19 @@ sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci-l
 sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci-nginx/Makefile
 sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci-ssl-nginx/Makefile
 
-# 更改Argonne主题背景
-cp -f $GITHUB_WORKSPACE/images/bg1.jpg openwrt/package/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
+# 更改Argon主题背景
+cp $GITHUB_WORKSPACE/images/bg1.jpg ./luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
 rm -rf theme-temp/luci-theme-argon/README.md
+
+# 更改alpha主题背景
+# cp $GITHUB_WORKSPACE/images/login.png ./luci-theme-alpha/luasrc/background/login.png
+# cp $GITHUB_WORKSPACE/images/dashboard.png ./luci-theme-alpha/luasrc/background/dashboard.png
+
 
 ########### 更改默认主题（可选）###########
 
 # 修改概览里时间显示为中文数字(F大打包工具会替换)
-sed -i 's/os.date()/os.date("%Y年%m月%d日") .. " " .. translate(os.date("%A")) .. " " .. os.date("%X")/g' package/lean/autocore/files/arm/index.htm
+# sed -i 's/os.date()/os.date("%Y年%m月%d日") .. " " .. translate(os.date("%A")) .. " " .. os.date("%X")/g' package/lean/autocore/files/arm/index.htm
 
 # 修改主题多余版本信息
 sed -i 's|<a class="luci-link" href="https://github.com/openwrt/luci"|<a|g' feeds/luci/themes/luci-theme-argon/luasrc/view/themes/argon/footer.htm
