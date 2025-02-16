@@ -32,7 +32,7 @@ sed -i 's/192.168.1.1/192.168.1.101/g' package/base-files/files/bin/config_gener
 sed -i 's/192.168.1.1/192.168.1.101/g' package/base-files/luci2/bin/config_generate
 
 # 修改主机名称
-sed -i "s/hostname='LEDE'/hostname='OpenWrt-N1'/g" package/base-files/files/bin/config_generate
+sed -i "s/hostname='LEDE'/hostname='N1'/g" package/base-files/files/bin/config_generate
 
 ########### 更改默认主题（可选）###########
 # 删除主题
@@ -50,7 +50,7 @@ sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci-n
 sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci-ssl-nginx/Makefile
 
 # 更改Argon主题背景
-cp $GITHUB_WORKSPACE/images/bg1.jpg ./luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
+cp $GITHUB_WORKSPACE/images/bg1.jpg feeds/luci/themes/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
 rm -rf theme-temp/luci-theme-argon/README.md
 
 # 更改alpha主题背景
@@ -61,7 +61,7 @@ rm -rf theme-temp/luci-theme-argon/README.md
 ########### 更改默认主题（可选）###########
 
 # 修改概览里时间显示为中文数字(F大打包工具会替换)
-# sed -i 's/os.date()/os.date("%Y年%m月%d日") .. " " .. translate(os.date("%A")) .. " " .. os.date("%X")/g' package/lean/autocore/files/arm/index.htm
+sed -i 's/os.date()/os.date("%Y年%m月%d日") .. " " .. translate(os.date("%A")) .. " " .. os.date("%X")/g' package/lean/autocore/files/arm/index.htm
 
 # 修改主题多余版本信息
 sed -i 's|<a class="luci-link" href="https://github.com/openwrt/luci"|<a|g' feeds/luci/themes/luci-theme-argon/luasrc/view/themes/argon/footer.htm
@@ -69,16 +69,13 @@ sed -i 's|<a href="https://github.com/jerrykuku/luci-theme-argon" target="_blank
 sed -i 's/<a href=\"https:\/\/github.com\/coolsnowwolf\/luci\">/<a>/g' feeds/luci/themes/luci-theme-bootstrap/luasrc/view/themes/bootstrap/footer.htm
 
 # 去除型号右侧肿瘤式跑分信息
-sed -i "s|\ <%=luci.sys.exec(\"cat \/etc\/bench.log\") or \" \"%>||g" feeds/luci/modules/luci-mod-admin-full/luasrc/view/admin_status/index.htm
+# sed -i "s|\ <%=luci.sys.exec(\"cat \/etc\/bench.log\") or \" \"%>||g" feeds/luci/modules/luci-mod-admin-full/luasrc/view/admin_status/index.htm
 
 # coremark跑分定时清除
 sed -i '/\* \* \* \/etc\/coremark.sh/d' feeds/packages/utils/coremark/*
 
 # 为 armvirt 架构添加 autocore 支持
 sed -i 's/TARGET_rockchip/TARGET_rockchip\|\|TARGET_armvirt/g' package/lean/autocore/Makefile
-
-# 设置OpenWrt 发行版的修订版本
-# sed -i "s/OpenWrt /Deng Build $(TZ=UTC-8 date "+%Y.%m") @ OpenWrt /g" package/lean/default-settings/files/zzz-default-settings
 
 # 设置samba4权限
 sed -i 's/invalid users = root/#invalid users = root/g' feeds/packages/net/samba4/files/smb.conf.template
@@ -121,7 +118,7 @@ sed -i 's/services/nas/g' feeds/luci/applications/luci-app-alist/root/usr/share/
 sed -i 's/services/nas/g' feeds/luci/applications/luci-app-hd-idle/root/usr/share/luci/menu.d/luci-app-hd-idle.json
 sed -i 's/services/nas/g' feeds/luci/applications/luci-app-hd-idle/root/usr/share/luci/menu.d/luci-app-hd-idle.json
 sed -i 's/services/nas/g' feeds/luci/applications/luci-app-samba4/root/usr/share/luci/menu.d/luci-app-samba4.json
-sed -i 's/services/nas/g'  feeds/luci/applications/luci-app-aria2/root/usr/share/luci/menu.d/luci-app-aria2.json
+sed -i 's/services/nas/g' feeds/luci/applications/luci-app-aria2/root/usr/share/luci/menu.d/luci-app-aria2.json
 
 # 修改插件名字
 sed -i 's/"管理权"/"管理"/g' `grep "管理权" -rl ./`
@@ -163,6 +160,7 @@ for e in $(ls -d $destination_dir/luci-*/po feeds/luci/applications/luci-*/po); 
         ln -s zh_Hans $e/zh-cn 2>/dev/null
     fi
 done
+
 
 ./scripts/feeds update -a
 ./scripts/feeds install -a
