@@ -22,7 +22,8 @@ sed -i 's/192.168.1.1/192.168.1.101/g' package/base-files/files/bin/config_gener
 sed -i 's/192.168.1.1/192.168.1.101/g' package/base-files/luci2/bin/config_generate
 
 # 修改主机名称
-sed -i "s/hostname='LEDE'/hostname='N1'/g" package/base-files/files/bin/config_generate
+sed -i "/uci -q set system\.\@system\[0\]\.hostname=/s/'LEDE'/'LEDE-N1'/" package/base-files/files/bin/config_generate 
+
 
 ########### 更改默认主题（可选）###########
 # 删除主题
@@ -36,9 +37,11 @@ git clone https://github.com/jerrykuku/luci-app-argon-config.git  package/luci-a
 # 修改主题配置
 sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci/Makefile
 
-# 更改Argon主题背景
-cp $GITHUB_WORKSPACE/images/bg1.jpg feeds/luci/themes/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
-rm -rf theme-temp/luci-theme-argon/README.md
+# 创建覆盖目录结构 
+mkdir -p files/luci/themes/luci-theme-argon/htdocs/luci-static/argon/img/
+# 复制自定义背景图 
+cp -f $GITHUB_WORKSPACE/images/bg1.jpg  files/luci/themes/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg  
+
 
 # 更改alpha主题背景
 # cp $GITHUB_WORKSPACE/images/login.png ./luci-theme-alpha/luasrc/background/login.png
@@ -110,7 +113,8 @@ sed -i 's/services/nas/g' feeds/luci/applications/luci-app-aria2/root/usr/share/
 # 修改插件名字
 sed -i 's/"管理权"/"管理"/g' `grep "管理权" -rl ./`
 sed -i 's/"软件包"/"软件管理"/g' `grep "软件包" -rl ./`
-sed -i 's/"Argon 主题设置"/"主题设置"/g' `grep "Argon 主题设置" -rl ./`
+sed -i 's/"Argon 主题设置"/"Argon配置"/g' `grep "Argon 主题设置" -rl ./`
+sed -i 's/"Alpha_Config"/"Alpha配置"/g' `grep "Alpha_Config" -rl ./`
 sed -i 's/"AdGuard Home"/"AdGuard"/g' `grep "AdGuard Home" -rl ./`
 sed -i 's/"NAS"/"存储"/g' `grep "NAS" -rl ./`
 sed -i 's/"Aria2 配置"/"Aria2"/g' `grep "Aria2 配置" -rl ./`
@@ -119,6 +123,7 @@ sed -i 's/"Alist 文件列表"/"Alist"/g' `grep "Alist 文件列表" -rl ./`
 sed -i 's/"挂载点"/"磁盘挂载"/g' `grep "挂载点" -rl ./`
 sed -i 's/"Npc"/"Nps内网穿透"/g' `grep "Npc" -rl ./`
 sed -i 's/"frp 客户端"/"Frp内网穿透"/g' `grep "frp 客户端" -rl ./`
+sed -i 's/"ShadowSocksR Plus+"/"SSR Plus+"/g' `grep "ShadowSocksR Plus+" -rl ./`
 sed -i 's/"NPS 内网穿透客户端"/"NPS内网穿透"/g' `grep "NPS 内网穿透客户端" -rl ./`
 
 # 调整部分插件名字
@@ -127,6 +132,7 @@ sed -i '/msgid "Startup"/{n;s/启动项/启动管理/;}' feeds/luci/modules/luci
 sed -i 's/msgstr "备份与升级"/msgstr "备份\/升级"/g' feeds/luci/modules/luci-base/po/zh_Hans/base.po
 sed -i 's/msgstr "DHCP\/DNS"/msgstr "DHCP服务"/g' feeds/luci/modules/luci-base/po/zh_Hans/base.po
 sed -i 's/msgstr "网络存储"/msgstr "存储"/g' feeds/luci/applications/luci-app-vsftpd/po/zh_Hans/vsftpd.po
+
 
 #将AdGuardHome核心文件编译进目录
 curl -s https://api.github.com/repos/AdguardTeam/AdGuardHome/releases/latest \
@@ -148,9 +154,6 @@ for e in $(ls -d $destination_dir/luci-*/po feeds/luci/applications/luci-*/po); 
     fi
 done
 
-
-./scripts/feeds update -a
-./scripts/feeds install -a
 
 echo "========================="
 echo " DIY2 配置完成……"
