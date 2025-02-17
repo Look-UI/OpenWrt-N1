@@ -17,6 +17,12 @@ echo "========================="
 # ttyd自动登录
 sed -i "s?/bin/login?/usr/libexec/login.sh?g" feeds/packages/utils/ttyd/files/ttyd.config
 
+# 更改默认 Shell 为 zsh
+# sed -i 's/\/bin\/ash/\/usr\/bin\/zsh/g' package/base-files/files/etc/passwd
+# 安装 zsh 到固件（编译前操作）
+echo "CONFIG_PACKAGE_zsh=y" >> .config 
+echo "CONFIG_PACKAGE_zsh-autosuggestions=y" >> .config  # 自动补全插件 
+
 # 修改默认IP
 sed -i 's/192.168.1.1/192.168.1.101/g' package/base-files/files/bin/config_generate
 sed -i 's/192.168.1.1/192.168.1.101/g' package/base-files/luci2/bin/config_generate
