@@ -25,7 +25,7 @@ sed -i 's/192.168.1.1/192.168.1.101/g' package/base-files/files/bin/config_gener
 sed -i 's/192.168.1.1/192.168.1.101/g' package/base-files/luci2/bin/config_generate
 
 # 修改主机名称
-sed -i "/uci -q set system\.\@system\[0\]\.hostname=/s/'LEDE'/'LEDE-N1'/" package/base-files/files/bin/config_generate 
+sed -i 's/LEDE/openwrt-N1/g' package/base-files/files/bin/config_generate
 
 
 ########### 更改默认主题（可选）###########
