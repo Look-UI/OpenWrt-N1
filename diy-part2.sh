@@ -39,11 +39,8 @@ git clone -b v0.9 https://github.com/jerrykuku/luci-app-argon-config.git  packag
 git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon.git  package/luci-app-argon-config
 
 
-# 修改主题配置
-sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci/Makefile
-sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci-light/Makefile
-sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci-ssl-nginx/Makefile
-sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' feeds/luci/collections/luci-nginx/Makefile
+# 去除默认bootstrap主题
+sed -i 's/[b|B]ootstrap/argon/g' ./feeds/luci/collections/luci/Makefile
 
 
 
