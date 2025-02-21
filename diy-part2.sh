@@ -30,8 +30,8 @@ sed -i 's/LEDE/openwrt-N1/g' package/base-files/files/bin/config_generate
 
 ########### 更改默认主题（可选）###########
 # 删除主题
-rm -rf feeds/luci/themes/luci-theme-bootstrap
 rm -rf feeds/luci/themes/luci-theme-argon
+rm -rf feeds/luci/applications/luci-app-argon-config
 
 
 # 拉取 argon 源码
