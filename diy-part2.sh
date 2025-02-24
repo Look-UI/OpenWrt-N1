@@ -34,7 +34,7 @@ rm -rf feeds/luci/themes/luci-theme-argon
 rm -rf feeds/luci/applications/luci-app-argon-config
 
 # 拉取 argon 源码
-git clone -b v0.9 https://github.com/jerrykuku/luci-app-argon-config.git package/luci-app-argon-config   
+git clone -b 18.06 https://github.com/jerrykuku/luci-app-argon-config.git package/luci-app-argon-config   
 git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon.git  package/luci-theme-argon
 
 # 修改主题配置
