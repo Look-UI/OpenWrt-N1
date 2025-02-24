@@ -173,8 +173,8 @@ CONFIG_PACKAGE_lsblk=y
 # CONFIG_PACKAGE_luci-app-accesscontrol is not set
 CONFIG_PACKAGE_luci-app-adguardhome=y
 CONFIG_PACKAGE_luci-app-amlogic=y
-# CONFIG_PACKAGE_luci-app-argone-config is not set
-CONFIG_PACKAGE_luci-app-alpha-config=y
+CONFIG_PACKAGE_luci-app-argone-config=y
+# CONFIG_PACKAGE_luci-app-alpha-config=y
 CONFIG_PACKAGE_luci-app-argon-config=y
 CONFIG_PACKAGE_luci-app-arpbind=y
 CONFIG_PACKAGE_luci-app-autoreboot=y
@@ -231,8 +231,8 @@ CONFIG_PACKAGE_luci-app-passwall_Iptables_Transparent_Proxy=y
 
 # Themes
 CONFIG_PACKAGE_luci-theme-argon=y
-CONFIG_PACKAGE_luci-theme-alpha=y
-# CONFIG_PACKAGE_luci-theme-argone is not set
+# CONFIG_PACKAGE_luci-theme-alpha=y
+CONFIG_PACKAGE_luci-theme-argone=y
 
 # CONFIG_PACKAGE_miniupnpd is not set
 CONFIG_PACKAGE_mount-utils=y
