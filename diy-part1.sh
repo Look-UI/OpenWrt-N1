@@ -24,7 +24,7 @@ echo 'src-git fichenx https://github.com/fichenx/openwrt-package' >>feeds.conf.d
 ## 通用版luci适合18.06与19.07
 sed -i 'src-git kenzo https://github.com/kenzok8/openwrt-packages' feeds.conf.default
 sed -i 'src-git small https://github.com/kenzok8/small' feeds.conf.default
-sed -i 'src-git luci https://github.com/coolsnowwolf/luci' >>feeds.conf.default
+sed -i 'src-git luci https://github.com/coolsnowwolf/luci' feeds.conf.default
 ./scripts/feeds update luci
 ./scripts/feeds install -a -p luci
 
