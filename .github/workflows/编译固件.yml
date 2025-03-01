@@ -27,6 +27,7 @@ env:
   DIY_P1_SH: diy-part1.sh
   DIY_P2_SH: diy-part2.sh
   TZ: Asia/Shanghai
+  TERM: xterm  # 设置终端类型
 
 jobs:
   build:
@@ -176,14 +177,13 @@ jobs:
         KERNEL_VERSION_NAME: 5.15.10_6.1.10
         # KERNEL_REPO_URL: https://github.com/quanjindeng/Actions_OpenWrt-Amlogic/tree/main/kernel
         
-        
     - name: 整理文件
       run: mv /opt/openwrt_packit/output/* /workdir/upload/
       
     - name: 发布固件
       uses: ncipollo/release-action@v1
       with:
-        tag: openwrt_armvirt_v8_${{ env.PACKAGED_OUTPUTDATE }}
+        标签: openwrt_armvirt_v8_${{ env.PACKAGED_OUTPUTDATE }}
         artifacts: /workdir/upload/*
         allowUpdates: true
         token: ${{ secrets.GI_TOKEN }}
@@ -209,7 +209,7 @@ jobs:
       uses: Mattraks/delete-workflow-runs@main
       with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          repository: ${{ github.repository }}
+          仓库: ${{ github.repository }}
           keep_minimum_runs: 0
           retain_days: 7
           #retain_days: ${{ github.event.inputs.action_days }}
@@ -217,7 +217,7 @@ jobs:
     - name: 删除多余releases
       uses: dev-drprasad/delete-older-releases@master
       with:
-        repo: ${{ github.reposiyory }}
+        repo: ${{ github.repository }}
         keep_latest: 6
         #keep_latest: ${{ github.event.inputs.rele }}
         delete_tags: true
