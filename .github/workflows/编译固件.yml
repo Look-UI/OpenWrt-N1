@@ -27,7 +27,6 @@ env:
   DIY_P1_SH: diy-part1.sh
   DIY_P2_SH: diy-part2.sh
   TZ: Asia/Shanghai
-  TERM: xterm  # 设置终端类型
 
 jobs:
   build:
@@ -177,6 +176,7 @@ jobs:
         KERNEL_VERSION_NAME: 5.15.10_6.1.10
         # KERNEL_REPO_URL: https://github.com/quanjindeng/Actions_OpenWrt-Amlogic/tree/main/kernel
         
+        
     - name: 整理文件
       run: mv /opt/openwrt_packit/output/* /workdir/upload/
       
@@ -217,7 +217,7 @@ jobs:
     - name: 删除多余releases
       uses: dev-drprasad/delete-older-releases@master
       with:
-        repo: ${{ github.repository }}
+        repo: ${{ github.reposiyory }}
         keep_latest: 6
         #keep_latest: ${{ github.event.inputs.rele }}
         delete_tags: true
