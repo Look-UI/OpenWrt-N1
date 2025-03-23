@@ -22,16 +22,22 @@ sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' ./feeds/luci/collections/luci
 sed -i 's/TARGET_rockchip/TARGET_rockchip\|\|TARGET_armvirt/g' package/lean/autocore/Makefile
 
 # Set DISTRIB_REVISION
-sed -i "s/OpenWrt /Deng Build $(TZ=UTC-8 date "+%Y.%m.%d") @ OpenWrt /g" package/lean/default-settings/files/zzz-default-settings
+sed -i "s/OpenWrt /Deng Build $(TZ=UTC-8 date "+%Y.%m.%d") @ OpenWrt /g" package/lean/default-settings/files/zzz-default-settings# 删除主题
+rm -rf feeds/luci/themes/luci-theme-argon
+rm -rf feeds/luci/applications/luci-app-argon-config
+
+# 拉取 argon 源码
+git clone -b 18.06 https://github.com/jerrykuku/luci-app-argon-config.git package/luci-app-argon-config   
+git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon.git  package/luci-theme-argon
 
 # Modify default IP（FROM 192.168.1.1 CHANGE TO 10.10.10.1）
-sed -i 's/192.168.1./10.10.10./g' package/base-files/files/bin/config_generate
-sed -i 's/192.168.1./10.10.10./g' package/base-files/luci2/bin/config_generate
-sed -i 's/192.168.1./10.10.10./g' package/base-files/Makefile
-sed -i 's/192.168.1./10.10.10./g' package/base-files/image-config.in
+sed -i 's/192.168.1.1/192.168.1.10/g' package/base-files/files/bin/config_generate
+sed -i 's/192.168.1.1/192.168.1.10/g' package/base-files/luci2/bin/config_generate
+sed -i 's/192.168.1.1/192.168.1.10/g' package/base-files/Makefile
+sed -i 's/192.168.1.1/192.168.1.10/g' package/base-files/image-config.in
 
 # Modify system hostname（FROM OpenWrt CHANGE TO OpenWrt-N1）
-# sed -i 's/OpenWrt/OpenWrt-N1/g' package/base-files/files/bin/config_generate
+sed -i 's/OpenWrt/OpenWrt-N1/g' package/base-files/files/bin/config_generate
 
 # Replace the default software source
 # sed -i 's#openwrt.proxy.ustclug.org#mirrors.bfsu.edu.cn\\/openwrt#' package/lean/default-settings/files/zzz-default-settings
@@ -42,77 +48,105 @@ sed -i 's/invalid users = root/#invalid users = root/g' feeds/packages/net/samba
 sed -i '/exit 0/i\chmod +x /etc/init.d/*' package/lean/default-settings/files/zzz-default-settings
 
 # 拉取软件包
-
-git clone https://github.com/ophub/luci-app-amlogic.git package/luci-app-amlogic
-git clone https://github.com/kenzok8/small-package package/small-package
-# git clone -b luci https://github.com/pexcn/openwrt-chinadns-ng.git package/luci-app-chinadns-ng
-# svn co https://github.com/immortalwrt-collections/openwrt-gowebdav/trunk/luci-app-gowebdav package/luci-app-gowebdav
-# svn co https://github.com/immortalwrt-collections/openwrt-gowebdav/trunk/gowebdav package/gowebdav
 git clone https://github.com/jerrykuku/luci-app-argon-config.git package/luci-app-argon-config
 git clone https://github.com/jerrykuku/luci-theme-argon.git package/luci-theme-argon
-git clone https://github.com/UnblockNeteaseMusic/luci-app-unblockneteasemusic.git package/luci-app-unblockneteasemusic
-svn co https://github.com/kiddin9/openwrt-packages/trunk/UnblockNeteaseMusic-Go package/UnblockNeteaseMusic-Go
-svn co https://github.com/kiddin9/openwrt-packages/trunk/luci-app-unblockneteasemusic-go package/luci-app-unblockneteasemusic-go
-git clone --depth 1 https://github.com/brvphoenix/luci-app-wrtbwmon package/deng/luci-app-wrtbwmon
-git clone --depth 1 https://github.com/brvphoenix/wrtbwmon package/deng/wrtbwmon
 
-
-# 删除重复包
-
-rm -rf package/small-package/luci-app-wechatpush
-# rm -rf feeds/luci/applications/luci-app-netdata
-rm -rf feeds/luci/applications/luci-app-qbittorrent
-rm -rf feeds/packages/net/qBittorrent-static
-rm -rf feeds/packages/net/qBittorrent
-rm -rf package/small-package/luci-app-netdata
-# rm -rf package/small-package/luci-app-qbittorrent
-# rm -rf package/small-package/qBittorrent-static
-# rm -rf package/small-package/qBittorrent
-# rm -rf package/small-package/qbittorrent
-rm -rf feeds/luci/themes/luci-theme-argon
-rm -rf package/small-package/luci-app-openvpn-server
-rm -rf package/small-package/openvpn-easy-rsa-whisky
-# rm -rf package/small-package/luci-app-wrtbwmon
-# rm -rf package/small-package/wrtbwmon
-rm -rf package/small-package/luci-app-koolproxyR
-rm -rf package/small-package/luci-app-godproxy
-rm -rf package/small-package/luci-app-argon*
-rm -rf package/small-package/luci-theme-argon*
-rm -rf package/small-package/luci-app-amlogic
-rm -rf package/small-package/luci-app-unblockneteasemusic
-rm -rf package/small-package/upx-static
-rm -rf package/small-package/upx
-rm -rf package/small-package/firewall*
-rm -rf package/small-package/opkg
-rm -rf package/feeds/packages/aliyundrive-webdav
-rm -rf feeds/packages/multimedia/aliyundrive-webdav
-rm -rf package/feeds/packages/perl-xml-parser
-rm -rf package/feeds/packages/lrzsz
-rm -rf package/feeds/packages/xfsprogs
-# 其他调整
-NAME=$"package/luci-app-unblockneteasemusic/root/usr/share/unblockneteasemusic" && mkdir -p $NAME/core
-curl 'https://api.github.com/repos/UnblockNeteaseMusic/server/commits?sha=enhanced&path=precompiled' -o commits.json
-echo "$(grep sha commits.json | sed -n "1,1p" | cut -c 13-52)">"$NAME/core_local_ver"
-curl -L https://github.com/UnblockNeteaseMusic/server/raw/enhanced/precompiled/app.js -o $NAME/core/app.js
-curl -L https://github.com/UnblockNeteaseMusic/server/raw/enhanced/precompiled/bridge.js -o $NAME/core/bridge.js
-curl -L https://github.com/UnblockNeteaseMusic/server/raw/enhanced/ca.crt -o $NAME/core/ca.crt
-curl -L https://github.com/UnblockNeteaseMusic/server/raw/enhanced/server.crt -o $NAME/core/server.crt
-curl -L https://github.com/UnblockNeteaseMusic/server/raw/enhanced/server.key -o $NAME/core/server.key
+# 修改概览里时间显示为中文数字(F大打包工具会替换)
+sed -i 's/os.date()/os.date("%Y年%m月%d日") .. " " .. translate(os.date("%A")) .. " " .. os.date("%X")/g' package/lean/autocore/files/arm/index.htm
+# 修改主题多余版本信息
+sed -i 's|<a class="luci-link" href="https://github.com/openwrt/luci"|<a|g' feeds/luci/themes/luci-theme-argon/luasrc/view/themes/argon/footer.htm
+sed -i 's|<a href="https://github.com/jerrykuku/luci-theme-argon" target="_blank">|<a>|g' feeds/luci/themes/luci-theme-argon/luasrc/view/themes/argon/footer.htm
+sed -i 's/<a href=\"https:\/\/github.com\/coolsnowwolf\/luci\">/<a>/g' feeds/luci/themes/luci-theme-bootstrap/luasrc/view/themes/bootstrap/footer.htm
+# coremark跑分定时清除
+sed -i '/\* \* \* \/etc\/coremark.sh/d' feeds/packages/utils/coremark/*
 
 sed -i 's#https://github.com/breakings/OpenWrt#https://github.com/quanjindeng/Actions_OpenWrt-Amlogic#g' package/luci-app-amlogic/luci-app-amlogic/root/etc/config/amlogic
 sed -i 's#ARMv8#openwrt_armvirt_v8#g' package/luci-app-amlogic/luci-app-amlogic/root/etc/config/amlogic
 sed -i 's#opt/kernel#kernel#g' package/luci-app-amlogic/luci-app-amlogic/root/etc/config/amlogic
 
-sed -i 's#mount -t cifs#mount.cifs#g' feeds/luci/applications/luci-app-cifs-mount/root/etc/init.d/cifs
-
-#sed -i 's#<%+cbi/tabmenu%>##g' package/small-packages/luci-app-nginx-manager/luasrc/view/nginx-manager/index.htm
-
 # golang版本修复
 rm -rf feeds/packages/lang/golang
 git clone https://github.com/sbwml/packages_lang_golang feeds/packages/lang/golang
 
-# mosdns
-find ./ | grep Makefile | grep v2ray-geodata | xargs rm -f
-find ./ | grep Makefile | grep mosdns | xargs rm -f
-git clone https://github.com/sbwml/luci-app-mosdns package/mosdns
-git clone https://github.com/sbwml/v2ray-geodata package/geodata
+
+# 在线用户
+git clone --depth=1 https://github.com/danchexiaoyang/luci-app-onliner.git package/luci-app-onliner
+
+## DDNSGO 
+git clone --depth 1 https://github.com/sirpdboy/luci-app-ddns-go package/new/ddnsgo
+mv -n package/new/ddnsgo/*ddns-go package/new/
+rm -rf package/new/ddnsgo
+
+# 通知插件
+git clone https://github.com/tty228/luci-app-serverchan.git package/luci-app-serverchan
+
+# Add luci-app-amlogic 晶晨宝盒
+git clone https://github.com/ophub/luci-app-amlogic.git  package-temp/luci-app-amlogic
+mv -f package-temp/luci-app-amlogic/luci-app-amlogic package/lean/
+rm -rf package-temp
+
+# NPS内网穿透
+# git clone https://github.com/yhl452493373/npc.git package/npc
+# git clone https://github.com/yhl452493373/luci-app-npc.git package/luci-app-npc
+
+# 调整终端到系统菜单
+sed -i 's/services/system/g' feeds/luci/applications/luci-app-ttyd/root/usr/share/luci/menu.d/luci-app-ttyd.json
+sed -i '3a \		"order": 10,' feeds/luci/applications/luci-app-ttyd/root/usr/share/luci/menu.d/luci-app-ttyd.json
+sed -i 's,终端,终端管理,g' feeds/luci/applications/luci-app-ttyd/po/zh_Hans/ttyd.po
+
+# 调整nlbwmon带宽监控调整菜单位置到网络
+sed -i 's/带宽监控/监控/g' feeds/luci/applications/luci-app-nlbwmon/po/zh_Hans/nlbwmon.po
+sed -i 's/services/network/g' feeds/luci/applications/luci-app-nlbwmon/root/usr/share/luci/menu.d/luci-app-nlbwmon.json
+sed -i 's/services/network/g' feeds/luci/applications/luci-app-nlbwmon/htdocs/luci-static/resources/view/nlbw/config.js
+
+# 调整部分插件到nas菜单
+sed -i 's/services/nas/g' feeds/luci/applications/luci-app-alist/root/usr/share/luci/menu.d/luci-app-alist.json
+sed -i 's/services/nas/g' feeds/luci/applications/luci-app-hd-idle/root/usr/share/luci/menu.d/luci-app-hd-idle.json
+sed -i 's/services/nas/g' feeds/luci/applications/luci-app-hd-idle/root/usr/share/luci/menu.d/luci-app-hd-idle.json
+sed -i 's/services/nas/g' feeds/luci/applications/luci-app-samba4/root/usr/share/luci/menu.d/luci-app-samba4.json
+sed -i 's/services/nas/g' feeds/luci/applications/luci-app-aria2/root/usr/share/luci/menu.d/luci-app-aria2.json
+
+# 修改插件名字
+sed -i 's/"管理权"/"管理"/g' `grep "管理权" -rl ./`
+sed -i 's/"软件包"/"软件管理"/g' `grep "软件包" -rl ./`
+sed -i 's/"Argon 主题设置"/"Argon配置"/g' `grep "Argon 主题设置" -rl ./`
+sed -i 's/"Alpha_Config"/"Alpha配置"/g' `grep "Alpha_Config" -rl ./`
+sed -i 's/"AdGuard Home"/"AdGuard"/g' `grep "AdGuard Home" -rl ./`
+sed -i 's/"NAS"/"存储"/g' `grep "NAS" -rl ./`
+sed -i 's/"Aria2 配置"/"Aria2"/g' `grep "Aria2 配置" -rl ./`
+sed -i 's/"实时流量监测"/"流量"/g' `grep "实时流量监测" -rl ./`
+sed -i 's/"Alist 文件列表"/"Alist"/g' `grep "Alist 文件列表" -rl ./`
+sed -i 's/"挂载点"/"磁盘挂载"/g' `grep "挂载点" -rl ./`
+sed -i 's/"Npc"/"Nps内网穿透"/g' `grep "Npc" -rl ./`
+sed -i 's/"frp 客户端"/"Frp内网穿透"/g' `grep "frp 客户端" -rl ./`
+sed -i 's/"ShadowSocksR Plus+"/"SSR Plus+"/g' `grep "ShadowSocksR Plus+" -rl ./`
+sed -i 's/"NPS 内网穿透客户端"/"NPS内网穿透"/g' `grep "NPS 内网穿透客户端" -rl ./`
+
+# 调整部分插件名字
+sed -i '/msgid "Reboot"/{n;s/重启/重启设备/;}' feeds/luci/modules/luci-base/po/zh_Hans/base.po
+sed -i '/msgid "Startup"/{n;s/启动项/启动管理/;}' feeds/luci/modules/luci-base/po/zh_Hans/base.po
+sed -i 's/msgstr "备份与升级"/msgstr "备份\/升级"/g' feeds/luci/modules/luci-base/po/zh_Hans/base.po
+sed -i 's/msgstr "DHCP\/DNS"/msgstr "DHCP服务"/g' feeds/luci/modules/luci-base/po/zh_Hans/base.po
+sed -i 's/msgstr "网络存储"/msgstr "存储"/g' feeds/luci/applications/luci-app-vsftpd/po/zh_Hans/vsftpd.po
+
+
+#将AdGuardHome核心文件编译进目录
+curl -s https://api.github.com/repos/AdguardTeam/AdGuardHome/releases/latest \
+| grep "browser_download_url.*AdGuardHome_linux_amd64.tar.gz" \
+| cut -d : -f 2,3 \
+| tr -d \" \
+| xargs curl -L -o /tmp/AdGuardHome_linux_amd64.tar.gz && \
+tar -xzvf /tmp/AdGuardHome_linux_amd64.tar.gz -C /tmp/ --strip-components=1 && \
+mkdir -p files/usr/bin/AdGuardHome && \
+mv /tmp/AdGuardHome/AdGuardHome files/usr/bin/AdGuardHome/
+chmod 0755 files/usr/bin/AdGuardHome/AdGuardHome
+
+# 转换插件语言翻译
+for e in $(ls -d $destination_dir/luci-*/po feeds/luci/applications/luci-*/po); do
+    if [[ -d $e/zh-cn && ! -d $e/zh_Hans ]]; then
+        ln -s zh-cn $e/zh_Hans 2>/dev/null
+    elif [[ -d $e/zh_Hans && ! -d $e/zh-cn ]]; then
+        ln -s zh_Hans $e/zh-cn 2>/dev/null
+    fi
+done
+
