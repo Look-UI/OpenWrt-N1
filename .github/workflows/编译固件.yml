@@ -22,10 +22,10 @@ on:
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
-  FEEDS_CONF: feeds.conf.default
-  CONFIG_FILE: .config-full
+  FEEDS_CONF: LEDE/feeds.conf.default
+  CONFIG_FILE: LEDE/.config-full
   DIY_P1_SH: diy-part1.sh
-  DIY_P2_SH: diy-part2.sh
+  DIY_P2_SH: LEDE/diy-part2.sh
   TZ: Asia/Shanghai
 
 jobs:
@@ -183,11 +183,11 @@ jobs:
         tag: openwrt_armvirt_v8_${{ env.PACKAGED_OUTPUTDATE }}
         artifacts: /workdir/upload/*
         allowUpdates: true
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.GB_TOKEN }}
         body: |
           ### **适用于Amlogic平台的N1盒子OpenWrt固件--全插件**
           * **固件信息：**
-          默认IP: `10.10.10.1`
+          默认IP: `192.168.1.10`
           默认用户名: `root`
           默认密码: `password`
           * **使用方法：**
@@ -196,8 +196,6 @@ jobs:
           3. 登录Luci界面后，可直接使用`晶晨宝盒`插件进行写入emmc或者更新操作（使用前先按需求填写好插件设置），免去手动输入命令！
           * **更新说明：**
           目前已集成大部分常用插件！
-          * **N1云编译OP固件互助交流群：**
-          https://t.me/OpenWrt_n1
           * **提示：**
           `openwrt_s905d_n1_XX_XX` 文件名才是固件！
 
@@ -218,4 +216,4 @@ jobs:
         #keep_latest: ${{ github.event.inputs.rele }}
         delete_tags: true
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GB_TOKEN }}
