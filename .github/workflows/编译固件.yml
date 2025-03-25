@@ -10,7 +10,7 @@
 # 优化调整 by https://github.com/quanjindeng/Actions_OpenWrt-Amlogic
 #
 
-name: 编译固件
+name: 编译固件（LEDE）
 
 on:
   repository_dispatch:
