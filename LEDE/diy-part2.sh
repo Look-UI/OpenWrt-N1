@@ -10,8 +10,11 @@
 # Description: OpenWrt DIY script part 2 (After Update feeds)
 #
 
+# TTYD 免登录
+sed -i 's|/bin/login|/bin/login -f root|g' feeds/packages/utils/ttyd/files/ttyd.config
+
 # 更改 Argon 主题背景
-cp -f $GITHUB_WORKSPACE/images/bg1.jpg package/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
+cp -f $GITHUB_WORKSPACE/images/bg1.png package/luci-theme-argon/htdocs/luci-static/argon/img/bg1.png
 
 #luci-app-passwall
 git clone --depth=1 https://github.com/xiaorouji/openwrt-passwall-packages package/openwrt-passwall
@@ -114,8 +117,8 @@ sed -i 's/services/nas/g' feeds/luci/applications/luci-app-aria2/root/usr/share/
 
 # 修改插件名字
 sed -i 's/"管理权"/"管理"/g' `grep "管理权" -rl ./`
-sed -i 's/"软件包"/"软件管理"/g' `grep "软件包" -rl ./`
-sed -i 's/"Argon 主题设置"/"Argon配置"/g' `grep "Argon 主题设置" -rl ./`
+sed -i 's/"软件包"/"软件"/g' `grep "软件包" -rl ./`
+sed -i 's/"Argon 主题设置"/"主题设置"/g' `grep "Argon 主题设置" -rl ./`
 sed -i 's/"AdGuard Home"/"AdGuard"/g' `grep "AdGuard Home" -rl ./`
 sed -i 's/"网络"/"网络配置"/g' `grep "网络" -rl ./`
 sed -i 's/"Aria2 配置"/"Aria2"/g' `grep "Aria2 配置" -rl ./`
@@ -125,6 +128,7 @@ sed -i 's/"挂载点"/"磁盘挂载"/g' `grep "挂载点" -rl ./`
 sed -i 's/"Npc"/"Nps内网穿透"/g' `grep "Npc" -rl ./`
 sed -i 's/"frp 客户端"/"Frp内网穿透"/g' `grep "frp 客户端" -rl ./`
 sed -i 's/"FTP 服务器"/"FTP服务器"/g' `grep "FTP 服务器" -rl ./`
+sed -i 's/"TTYD 终端"/"终端"/g' `grep "TTYD 终端" -rl ./`
 sed -i 's/"NPS 内网穿透客户端"/"NPS内网穿透"/g' `grep "NPS 内网穿透客户端" -rl ./`
 
 
