@@ -92,10 +92,6 @@ git clone https://github.com/rufengsuixing/luci-app-adguardhome.git package-temp
 mv -f package-temp/luci-app-adguardhome package/lean/
 rm -rf package-temp
 
-# NPS内网穿透
-git clone https://github.com/yhl452493373/npc.git package/npc
-git clone https://github.com/yhl452493373/luci-app-npc.git package/luci-app-npc
-
 # 添加 smartdns
 git clone https://github.com/pymumu/openwrt-smartdns package/smartdns
 git clone -b lede https://github.com/pymumu/luci-app-smartdns.git package/luci-app-smartdns
