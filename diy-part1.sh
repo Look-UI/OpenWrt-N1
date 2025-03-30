@@ -19,9 +19,7 @@ echo 'src-git passwall https://github.com/xiaorouji/openwrt-passwall' >>feeds.co
 
 ## 常用OpenWrt软件包源码合集，同步上游更新！
 ## 通用版luci适合18.06与19.07
-echo 'src-git small8 https://github.com/kenzok8/small-package' >>feeds.conf.default
-sed -i 'src-git kenzo https://github.com/kenzok8/openwrt-packages' feeds.conf.default
-sed -i 'src-git small https://github.com/kenzok8/small' feeds.conf.default
+sed -i '$a src-git smpackage https://github.com/kenzok8/small-package' feeds.conf.default
 
 ## 解除系统限制
 ulimit -u 10000
