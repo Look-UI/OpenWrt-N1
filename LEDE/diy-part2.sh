@@ -26,13 +26,14 @@ sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' ./feeds/luci/collections/luci
 sed -i 's/TARGET_rockchip/TARGET_rockchip\|\|TARGET_armvirt/g' package/lean/autocore/Makefile
 
 # Set DISTRIB_REVISION
-sed -i "s/OpenWrt /Deng Build $(TZ=UTC-8 date "+%Y.%m.%d") @ OpenWrt /g" package/lean/default-settings/files/zzz-default-settings# 删除主题
-rm -rf feeds/luci/themes/luci-theme-argon
-rm -rf feeds/luci/applications/luci-app-argon-config
+sed -i "s/OpenWrt /Deng Build $(TZ=UTC-8 date "+%Y.%m.%d") @ OpenWrt /g" package/lean/default-settings/files/zzz-default-settings
+
 
 # 拉取 argon 源码
 git clone -b 18.06 https://github.com/jerrykuku/luci-app-argon-config.git package/luci-app-argon-config   
 git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon.git  package/luci-theme-argon
+rm -rf package/luci-app-argon-config
+rm -rf package/luci-theme-argon
 
 # Modify default IP（FROM 192.168.1.1 CHANGE TO 10.10.10.1）
 sed -i 's/192.168.1.1/192.168.1.10/g' package/base-files/files/bin/config_generate
@@ -50,10 +51,6 @@ sed -i 's/invalid users = root/#invalid users = root/g' feeds/packages/net/samba
 
 # 修复部分插件自启动脚本丢失可执行权限问题
 sed -i '/exit 0/i\chmod +x /etc/init.d/*' package/lean/default-settings/files/zzz-default-settings
-
-# 拉取软件包
-git clone https://github.com/jerrykuku/luci-app-argon-config.git package/luci-app-argon-config
-git clone https://github.com/jerrykuku/luci-theme-argon.git package/luci-theme-argon
 
 # 修改概览里时间显示为中文数字(F大打包工具会替换)
 sed -i 's/os.date()/os.date("%Y年%m月%d日") .. " " .. translate(os.date("%A")) .. " " .. os.date("%X")/g' package/lean/autocore/files/arm/index.htm
@@ -98,7 +95,6 @@ rm -rf package-temp
 # NPS内网穿透
 git clone https://github.com/yhl452493373/npc.git package/npc
 git clone https://github.com/yhl452493373/luci-app-npc.git package/luci-app-npc
-
 
 # 添加 smartdns
 git clone https://github.com/pymumu/openwrt-smartdns package/smartdns
