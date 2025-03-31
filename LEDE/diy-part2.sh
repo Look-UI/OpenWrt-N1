@@ -67,8 +67,8 @@ sed -i 's#ARMv8#openwrt_armvirt_v8#g' package/luci-app-amlogic/luci-app-amlogic/
 sed -i 's#opt/kernel#kernel#g' package/luci-app-amlogic/luci-app-amlogic/root/etc/config/amlogic
 
 # golang版本修复
-rm -rf feeds/packages/lang/golang
-git clone https://github.com/sbwml/packages_lang_golang feeds/packages/lang/golang
+# rm -rf feeds/packages/lang/golang
+# git clone https://github.com/sbwml/packages_lang_golang feeds/packages/lang/golang
 
 # 在线用户
 git clone --depth=1 https://github.com/danchexiaoyang/luci-app-onliner.git package/luci-app-onliner
