@@ -70,10 +70,11 @@ git clone https://github.com/sbwml/packages_lang_golang feeds/packages/lang/gola
 # 在线用户
 git clone --depth=1 https://github.com/danchexiaoyang/luci-app-onliner.git package/luci-app-onliner
 
-## DDNSGO 
-git clone --depth 1 https://github.com/sirpdboy/luci-app-ddns-go package/new/ddnsgo
+## DDNSGO
 mv -n package/new/ddnsgo/*ddns-go package/new/
 rm -rf package/new/ddnsgo
+git clone --depth 1 https://github.com/sirpdboy/luci-app-ddns-go package/new/ddnsgo
+
 
 # 通知插件
 git clone https://github.com/tty228/luci-app-serverchan.git package/luci-app-serverchan
@@ -84,9 +85,9 @@ mv -f package-temp/luci-app-amlogic/luci-app-amlogic package/lean/
 rm -rf package-temp
 
 # Add luci-app-adguardhome
-git clone https://github.com/rufengsuixing/luci-app-adguardhome.git package-temp/luci-app-adguardhome
 mv -f package-temp/luci-app-adguardhome package/lean/
 rm -rf package-temp
+git clone https://github.com/rufengsuixing/luci-app-adguardhome.git package-temp/luci-app-adguardhome
 
 # 添加 smartdns
 git clone https://github.com/pymumu/openwrt-smartdns package/smartdns
