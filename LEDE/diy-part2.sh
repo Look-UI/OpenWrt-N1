@@ -23,10 +23,10 @@ sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' ./feeds/luci/collections/luci
 #sed -i 's/LUCI_DEPENDS.*/LUCI_DEPENDS:=\@\(arm\|\|aarch64\)/g' feeds/luci/applications/luci-app-cpufreq/Makefile
 
 # Add autocore support for armvirt
-sed -i 's/TARGET_rockchip/TARGET_rockchip\|\|TARGET_armvirt/g' package/lean/autocore/Makefile
+# sed -i 's/TARGET_rockchip/TARGET_rockchip\|\|TARGET_armvirt/g' package/lean/autocore/Makefile
 
 # Set DISTRIB_REVISION
-sed -i "s/OpenWrt /Deng Build $(TZ=UTC-8 date "+%Y.%m.%d") @ OpenWrt /g" package/lean/default-settings/files/zzz-default-settings
+sed -i "s/OpenWrt /LEDE Build $(TZ=UTC-8 date "+%Y.%m.%d") @ OpenWrt /g" package/lean/default-settings/files/zzz-default-settings
 
 # 拉取 argon 源码
 git clone -b 18.06 https://github.com/jerrykuku/luci-app-argon-config.git package/luci-app-argon-config   
@@ -34,17 +34,14 @@ git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon.git  package/lu
 rm -rf package/luci-app-argon-config
 rm -rf package/luci-theme-argon
 
-# Modify default IP（FROM 192.168.1.1 CHANGE TO 10.10.10.1）
+# Modify default IP
 sed -i 's/192.168.1.1/192.168.1.10/g' package/base-files/files/bin/config_generate
-sed -i 's/192.168.1.1/192.168.1.10/g' package/base-files/luci2/bin/config_generate
-sed -i 's/192.168.1.1/192.168.1.10/g' package/base-files/Makefile
-sed -i 's/192.168.1.1/192.168.1.10/g' package/base-files/image-config.in
 
 # Modify system hostname（FROM OpenWrt CHANGE TO OpenWrt-N1）
 sed -i 's/OpenWrt/OpenWrt-N1/g' package/base-files/files/bin/config_generate
 
 # Replace the default software source
-# sed -i 's#openwrt.proxy.ustclug.org#mirrors.bfsu.edu.cn\\/openwrt#' package/lean/default-settings/files/zzz-default-settings
+sed -i 's#openwrt.proxy.ustclug.org#mirrors.bfsu.edu.cn\\/openwrt#' package/lean/default-settings/files/zzz-default-settings
 
 sed -i 's/invalid users = root/#invalid users = root/g' feeds/packages/net/samba4/files/smb.conf.template
 
@@ -67,8 +64,8 @@ sed -i 's#ARMv8#openwrt_armvirt_v8#g' package/luci-app-amlogic/luci-app-amlogic/
 sed -i 's#opt/kernel#kernel#g' package/luci-app-amlogic/luci-app-amlogic/root/etc/config/amlogic
 
 # golang版本修复
-# rm -rf feeds/packages/lang/golang
-# git clone https://github.com/sbwml/packages_lang_golang feeds/packages/lang/golang
+rm -rf feeds/packages/lang/golang
+git clone https://github.com/sbwml/packages_lang_golang feeds/packages/lang/golang
 
 # 在线用户
 git clone --depth=1 https://github.com/danchexiaoyang/luci-app-onliner.git package/luci-app-onliner
@@ -119,8 +116,6 @@ sed -i 's/"FTP 服务器"/"FTP服务器"/g' `grep "FTP 服务器" -rl ./`
 sed -i 's/"TTYD 终端"/"终端"/g' `grep "TTYD 终端" -rl ./`
 sed -i 's/"NPS 内网穿透客户端"/"NPS内网穿透"/g' `grep "NPS 内网穿透客户端" -rl ./`
 
-
-
 #将AdGuardHome核心文件编译进目录
 curl -s https://api.github.com/repos/AdguardTeam/AdGuardHome/releases/latest \
 | grep "browser_download_url.*AdGuardHome_linux_amd64.tar.gz" \
@@ -141,6 +136,5 @@ for e in $(ls -d $destination_dir/luci-*/po feeds/luci/applications/luci-*/po); 
     fi
 done
 
-#删除冲突插件，减少报错
-rm -rf feeds/smpackage/{base-files,dnsmasq,firewall*,fullconenat,libnftnl,nftables,ppp,opkg,ucl,upx,vsftpd*,miniupnpd-iptables,wireless-regdb}
-
+./scripts/feeds update -a
+./scripts/feeds install -a
