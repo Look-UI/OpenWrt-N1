@@ -68,34 +68,34 @@ sed -i 's#opt/kernel#kernel#g' package/luci-app-amlogic/luci-app-amlogic/root/et
 git clone --depth=1 https://github.com/danchexiaoyang/luci-app-onliner.git package/luci-app-onliner
 
 ## DDNSGO
-mv -n package/new/ddnsgo/*ddns-go package/new/
-rm -rf package/new/ddnsgo
-git clone --depth 1 https://github.com/sirpdboy/luci-app-ddns-go package/new/ddnsgo
-
+git clone https://github.com/sirpdboy/luci-app-ddns-go.git package/ddns-go
 
 # 通知插件
 git clone https://github.com/tty228/luci-app-serverchan.git package/luci-app-serverchan
 
 # Add luci-app-amlogic 晶晨宝盒
-git clone https://github.com/ophub/luci-app-amlogic.git  package-temp/luci-app-amlogic
-mv -f package-temp/luci-app-amlogic/luci-app-amlogic package/lean/
-rm -rf package-temp
+rm -rf package/luci-app-amlogic
+git clone https://github.com/ophub/luci-app-amlogic.git package/luci-app-amlogic
 
 # Add luci-app-adguardhome
-mv -f package-temp/luci-app-adguardhome package/lean/
-rm -rf package-temp
-git clone https://github.com/rufengsuixing/luci-app-adguardhome.git package-temp/luci-app-adguardhome
+git clone https://github.com/rufengsuixing/luci-app-adguardhome.git package/luci-app-adguardhome
 
 # 添加 smartdns
-git clone -b lede https://github.com/pymumu/luci-app-smartdns.git package/luci-app-smartdns
+git clone --depth=1 -b lede https://github.com/pymumu/luci-app-smartdns package/luci-app-smartdns
+git clone --depth=1 https://github.com/pymumu/openwrt-smartdns package/smartdns
+
+
+##### 科学上网插件 #####
+git clone --depth=1 -b main https://github.com/xiaorouji/openwrt-passwall-packages package/openwrt-passwall
+git clone --depth=1 -b main https://github.com/xiaorouji/openwrt-passwall package/luci-app-passwall
 
 
 # 调整部分插件到nas菜单
-sed -i 's/services/nas/g' feeds/luci/applications/luci-app-alist/root/usr/share/luci/menu.d/luci-app-alist.json
-sed -i 's/services/nas/g' feeds/luci/applications/luci-app-hd-idle/root/usr/share/luci/menu.d/luci-app-hd-idle.json
-sed -i 's/services/nas/g' feeds/luci/applications/luci-app-hd-idle/root/usr/share/luci/menu.d/luci-app-hd-idle.json
-sed -i 's/services/nas/g' feeds/luci/applications/luci-app-samba4/root/usr/share/luci/menu.d/luci-app-samba4.json
-sed -i 's/services/nas/g' feeds/luci/applications/luci-app-aria2/root/usr/share/luci/menu.d/luci-app-aria2.json
+#sed -i 's/services/nas/g' feeds/luci/applications/luci-app-alist/root/usr/share/luci/menu.d/luci-app-alist.json
+#sed -i 's/services/nas/g' feeds/luci/applications/luci-app-hd-idle/root/usr/share/luci/menu.d/luci-app-hd-idle.json
+#sed -i 's/services/nas/g' feeds/luci/applications/luci-app-hd-idle/root/usr/share/luci/menu.d/luci-app-hd-idle.json
+#sed -i 's/services/nas/g' feeds/luci/applications/luci-app-samba4/root/usr/share/luci/menu.d/luci-app-samba4.json
+#sed -i 's/services/nas/g' feeds/luci/applications/luci-app-aria2/root/usr/share/luci/menu.d/luci-app-aria2.json
 
 # 修改插件名字
 sed -i 's/"管理权"/"管理"/g' `grep "管理权" -rl ./`
