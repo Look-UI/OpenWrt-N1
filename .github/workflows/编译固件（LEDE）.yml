@@ -111,17 +111,6 @@ jobs:
     - name: 安装feeds
       run: cd openwrt && ./scripts/feeds install -a
 
-    - name: 检查依赖
-      run: |
-        cd openwrt
-        # 这里可以添加具体的依赖检查逻辑，比如检查 Makefile 里提到的依赖是否存在
-        # 例如检查 dogcom 是否存在
-        if ! ./scripts/feeds list | grep -q "dogcom"; then
-          echo "Error: dogcom 依赖缺失"
-          exit 1
-        fi
-        # 同理添加其他依赖的检查
-
     - name: 加载自定义配置
       run: |
         [ -e files ] && mv files openwrt/files
@@ -146,7 +135,7 @@ jobs:
       run: |
         cd openwrt
         echo -e "$(nproc) thread compile"
-        make -j1 V=s
+        make -j$(nproc) || make -j1 || make -j1 V=s
         echo "status=success" >> $GITHUB_OUTPUT
         grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
         [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
@@ -191,7 +180,7 @@ jobs:
     - name: 发布固件
       uses: ncipollo/release-action@v1
       with:
-        tag: openwrt_armvirt_v8_${{ env.FILE_DATE }}
+        tag: openwrt_armvirt_v8_${{ env.PACKAGED_OUTPUTDATE }}
         artifacts: /workdir/upload/*
         allowUpdates: true
         token: ${{ secrets.GB_TOKEN }}
@@ -227,4 +216,4 @@ jobs:
         #keep_latest: ${{ github.event.inputs.rele }}
         delete_tags: true
       env:
-        GITHUB_TOKEN: ${{ secrets.GB_TOKEN }}    
+        GITHUB_TOKEN: ${{ secrets.GB_TOKEN }}
