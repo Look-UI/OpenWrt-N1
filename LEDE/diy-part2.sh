@@ -111,22 +111,3 @@ sed -i 's/"FTP 服务器"/"FTP服务器"/g' `grep "FTP 服务器" -rl ./`
 sed -i 's/"TTYD 终端"/"终端"/g' `grep "TTYD 终端" -rl ./`
 sed -i 's/"NPS 内网穿透客户端"/"NPS内网穿透"/g' `grep "NPS 内网穿透客户端" -rl ./`
 
-#将AdGuardHome核心文件编译进目录
-curl -s https://api.github.com/repos/AdguardTeam/AdGuardHome/releases/latest \
-| grep "browser_download_url.*AdGuardHome_linux_amd64.tar.gz" \
-| cut -d : -f 2,3 \
-| tr -d \" \
-| xargs curl -L -o /tmp/AdGuardHome_linux_amd64.tar.gz && \
-tar -xzvf /tmp/AdGuardHome_linux_amd64.tar.gz -C /tmp/ --strip-components=1 && \
-mkdir -p files/usr/bin/AdGuardHome && \
-mv /tmp/AdGuardHome/AdGuardHome files/usr/bin/AdGuardHome/
-chmod 0755 files/usr/bin/AdGuardHome/AdGuardHome
-
-# 转换插件语言翻译
-for e in $(ls -d $destination_dir/luci-*/po feeds/luci/applications/luci-*/po); do
-    if [[ -d $e/zh-cn && ! -d $e/zh_Hans ]]; then
-        ln -s zh-cn $e/zh_Hans 2>/dev/null
-    elif [[ -d $e/zh_Hans && ! -d $e/zh-cn ]]; then
-        ln -s zh_Hans $e/zh-cn 2>/dev/null
-    fi
-done
