@@ -26,10 +26,12 @@ sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' ./feeds/luci/collections/luci
 sed -i "s/OpenWrt /LEDE Build $(TZ=UTC-8 date "+%Y.%m.%d") @ OpenWrt /g" package/lean/default-settings/files/zzz-default-settings
 
 # 拉取 argon 源码
-rm -rf package/luci-app-argon-config
-rm -rf package/luci-theme-argon
-git clone --depth 1 https://github.com/kenzok78/luci-theme-argone package/luci-theme-argone
-git clone --depth 1 https://github.com/kenzok78/luci-app-argone-config package/luci-app-argone-config
+rm -rf package/small-package/luci-app-argon*
+rm -rf package/small-package/luci-theme-argon*
+git clone https://github.com/jerrykuku/luci-app-argon-config.git package/luci-app-argon-config
+git clone https://github.com/jerrykuku/luci-theme-argon.git package/luci-theme-argon
+# 更改 Argon 主题背景
+cp -f $GITHUB_WORKSPACE/images/bg1.jpg package/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
 
 # Modify default IP
 sed -i 's/192.168.1.1/192.168.1.10/g' package/base-files/files/bin/config_generate
@@ -81,6 +83,7 @@ git clone --depth=1 https://github.com/pymumu/openwrt-smartdns package/smartdns
 ##### 科学上网插件 #####
 git clone --depth=1 -b main https://github.com/xiaorouji/openwrt-passwall-packages package/openwrt-passwall
 git clone --depth=1 -b main https://github.com/xiaorouji/openwrt-passwall package/luci-app-passwall
+
 ####     调整     ####
 sed -i '/Pass Wall/s/-1/4/g' package/openwrt-packages/small/luci-app-passwall/luasrc/controller/passwall.lua
 sed -i 's/services/vpn/g'  `grep services -rl package/openwrt-packages/small/luci-app-passwall/luasrc`
@@ -106,6 +109,10 @@ sed -i 's/"services"/"vpn"/g'  feeds/luci/applications/luci-app-frpc/luasrc/mode
 sed -i 's/"services"/"vpn"/g'  feeds/luci/applications/luci-app-frpc/luasrc/model/cbi/frp/config.lua
 sed -i 's/\[services\]/\[vpn\]/g'  feeds/luci/applications/luci-app-frpc/luasrc/view/frp/frp_status.htm
 
+# Alist
+svn export https://github.com/sbwml/luci-app-alist/trunk/luci-app-alist package/luci-app-alist
+svn export https://github.com/sbwml/luci-app-alist/trunk/alist package/alist
+
 
 # 修改插件名字
 sed -i 's/"管理权"/"管理"/g' `grep "管理权" -rl ./`
@@ -122,6 +129,7 @@ sed -i 's/"frp 客户端"/"Frp内网穿透"/g' `grep "frp 客户端" -rl ./`
 sed -i 's/"FTP 服务器"/"FTP服务器"/g' `grep "FTP 服务器" -rl ./`
 sed -i 's/"TTYD 终端"/"终端"/g' `grep "TTYD 终端" -rl ./`
 sed -i 's/"NPS 内网穿透客户端"/"NPS内网穿透"/g' `grep "NPS 内网穿透客户端" -rl ./`
+sed -i 's/"ShadowSocksR Plus+"/"SSR Plus+"/g' `grep "ShadowSocksR Plus+" -rl ./`
 
 # 处理依赖死循环
 #删除导致编译失败的插件
