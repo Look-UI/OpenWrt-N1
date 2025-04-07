@@ -26,10 +26,12 @@ sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' ./feeds/luci/collections/luci
 sed -i "s/OpenWrt /LEDE Build $(TZ=UTC-8 date "+%Y.%m.%d") @ OpenWrt /g" package/lean/default-settings/files/zzz-default-settings
 
 # 拉取 argon 源码
-rm -rf package/lean/luci-theme-argon
-rm -rf package/lean/luci-app-argon-config
-sudo git clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon.git package/lean/luci-theme-argon
-sudo git clone https://github.com/jerrykuku/luci-app-argon-config.git package/lean/luci-app-argon-config
+rm -rf package/small-package/luci-app-argon*
+rm -rf package/small-package/luci-theme-argon*
+
+git clone clone -b 18.06 https://github.com/jerrykuku/luci-theme-argon.git package/lean/luci-theme-argon
+git clone clone https://github.com/jerrykuku/luci-app-argon-config.git package/lean/luci-app-argon-config
+
 # 更改 Argon 主题背景
 cp -f $GITHUB_WORKSPACE/images/bg1.jpg package/luci-theme-argon/htdocs/luci-static/argon/img/bg1.jpg
 
@@ -51,7 +53,7 @@ sed -i 's/os.date()/os.date("%Y年%m月%d日") .. " " .. translate(os.date("%A")
 
 # 修改主题多余版本信息
 sed -i 's/<a class="luci-link" href="https://github.com/openwrt/luci"/<a/g' feeds/luci/themes/luci-theme-argon/luasrc/view/themes/argon/footer.htm
-sed -i 's|<a href="https://github.com/jerrykuku/luci-theme-argon" target="_blank">|<a>|g' feeds/luci/themes/luci-theme-argon/luasrc/view/themes/argon/footer.htm
+sed -i 's/<a href="https://github.com/jerrykuku/luci-theme-argon" target="_blank">/<a>/g' feeds/luci/themes/luci-theme-argon/luasrc/view/themes/argon/footer.htm
 sed -i 's/<a href=\"https:\/\/github.com\/coolsnowwolf\/luci\">/<a>/g' feeds/luci/themes/luci-theme-bootstrap/luasrc/view/themes/bootstrap/footer.htm
 
 # coremark跑分定时清除
