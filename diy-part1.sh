@@ -19,7 +19,8 @@
 # 添加feed源（使用echo追加）
 echo 'src-git passwall https://github.com/xiaorouji/openwrt-passwall' >>feeds.conf.default
 echo 'src-git fichenx https://github.com/fichenx/openwrt-package' >> feeds.conf.default
-echo 'src-git small8 https://github.com/kenzok8/small-package' >>feeds.conf.default
+
+# echo 'src-git small8 https://github.com/kenzok8/small-package' >>feeds.conf.default
 
 
 ./scripts/feeds update -a && rm -rf feeds/luci/applications/luci-app-mosdns
