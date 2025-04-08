@@ -107,14 +107,15 @@ sed -i 's/"services"/"vpn"/g'  feeds/luci/applications/luci-app-frpc/luasrc/mode
 sed -i 's/\[services\]/\[vpn\]/g'  feeds/luci/applications/luci-app-frpc/luasrc/view/frp/frp_status.htm
 
 # Alist
-svn export https://github.com/sbwml/luci-app-alist/trunk/luci-app-alist package/luci-app-alist
-svn export https://github.com/sbwml/luci-app-alist/trunk/alist package/alist
+rm -rf feeds/luci/applications/luci-app-alist
+rm -rf feeds/packages/net/alist
+git clone --depth=1 https://github.com/sbwml/luci-app-alist package/luci-app-alist
 
 
 # 修改插件名字
 sed -i 's/"管理权"/"管理"/g' `grep "管理权" -rl ./`
 sed -i 's/"软件包"/"软件"/g' `grep "软件包" -rl ./`
-sed -i 's/"Argone 主题设置"/"主题设置"/g' `grep "Argone 主题设置" -rl ./`
+sed -i 's/"Argon 主题设置"/"主题设置"/g' `grep "Argon 主题设置" -rl ./`
 sed -i 's/"AdGuard Home"/"AdGuard"/g' `grep "AdGuard Home" -rl ./`
 sed -i 's/"网络"/"网络配置"/g' `grep "网络" -rl ./`
 sed -i 's/"重启"/"重启设备"/g' `grep "重启" -rl ./`
