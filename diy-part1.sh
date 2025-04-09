@@ -22,12 +22,8 @@ echo 'src-git fichenx https://github.com/fichenx/openwrt-package' >> feeds.conf.
 
 # echo 'src-git small8 https://github.com/kenzok8/small-package' >>feeds.conf.default
 
-
+# 删除mosdns
 ./scripts/feeds update -a && rm -rf feeds/luci/applications/luci-app-mosdns
-rm -rf feeds/packages/lang/golang
-git clone https://github.com/kenzok8/golang feeds/packages/lang/golang
-./scripts/feeds install -a 
-make menuconfig
 
 
 # 解除系统限制
