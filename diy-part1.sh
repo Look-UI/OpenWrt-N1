@@ -20,15 +20,17 @@
 echo 'src-git passwall https://github.com/xiaorouji/openwrt-passwall' >>feeds.conf.default
 echo 'src-git fichenx https://github.com/fichenx/openwrt-package' >> feeds.conf.default
 
+sed -i 'src-git kenzo https://github.com/kenzok8/openwrt-packages' feeds.conf.default
+sed -i 'src-git small https://github.com/kenzok8/small' feeds.conf.default
 
-# 删除mosdns
-sed -i '1i src-git smpackage https://github.com/kenzok8/small-package' feeds.conf.default
-./scripts/feeds update -a && rm -rf feeds/luci/applications/luci-app-mosdns && rm -rf feeds/packages/net/{alist,adguardhome,smartdns}
-rm -rf feeds/smpackage/{base-files,dnsmasq,firewall*,fullconenat,libnftnl,nftables,ppp,opkg,ucl,upx,vsftpd-alt,miniupnpd-iptables,wireless-regdb}
+
+./scripts/feeds update -a && rm -rf feeds/luci/applications/luci-app-mosdns
 rm -rf feeds/packages/lang/golang
 git clone https://github.com/kenzok8/golang feeds/packages/lang/golang
 ./scripts/feeds install -a 
 make menuconfig
+
+
 
 
 # 解除系统限制
