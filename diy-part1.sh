@@ -25,9 +25,9 @@ svn co https://github.com/openwrt/packages/branches/openwrt-22.03/lang/golang/go
 ./scripts/feeds install -a 
 make menuconfig
 
-#删除冲突插件
+# 删除已知冲突的插件
 rm -rf feeds/packages/net/luci-app-fchomo
-make defconfig
+rm -rf feeds/luci/applications/luci-app-bypass
 
 
 # 解除系统限制
