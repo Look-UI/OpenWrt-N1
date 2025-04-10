@@ -1,7 +1,4 @@
-## 常用OpenWrt软件包源码合集，同步上游更新！
-## 通用版luci适合18.06与19.07
-
-#!/bin/bash
+ #!/bin/bash
 #
 # Copyright (c) 2019-2020 P3TERX <https://p3terx.com>
 #
