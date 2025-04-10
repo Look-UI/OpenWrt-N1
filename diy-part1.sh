@@ -20,8 +20,8 @@ echo 'src-git small8 https://github.com/kenzok8/small-package' >>feeds.conf.defa
 
 
 ./scripts/feeds update -a && rm -rf feeds/luci/applications/luci-app-mosdns
-rm -rf feeds/packages/lang/golang
-git clone https://github.com/kenzok8/golang feeds/packages/lang/golang
+rm -rf feeds/packages/lang/golang/golang
+svn co https://github.com/openwrt/packages/branches/openwrt-22.03/lang/golang/golang feeds/packages/lang/golang/golang
 ./scripts/feeds install -a 
 make menuconfig
 
