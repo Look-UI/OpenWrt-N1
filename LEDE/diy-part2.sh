@@ -22,8 +22,11 @@ sed -i 's/luci-theme-bootstrap/luci-theme-argon/g' ./feeds/luci/collections/luci
 # Add autocore support for armvirt
 # sed -i 's/TARGET_rockchip/TARGET_rockchip\|\|TARGET_armvirt/g' package/lean/autocore/Makefile
 
-# Set DISTRIB_REVISION
-sed -i "s/OpenWrt /LEDE Build $(TZ=UTC-8 date "+%Y.%m.%d") @ OpenWrt /g" package/lean/default-settings/files/zzz-default-settings
+# 修复日期替换（方案2：动态日期 + 安全分隔符）
+sed -i "s|OpenWrt |LEDE Build $(TZ=UTC-8 date '+%Y.%m.%d') @ OpenWrt |g" package/lean/default-settings/files/zzz-default-settings
+
+# 修复软件源URL替换
+sed -i 's#openwrt.proxy.ustclug.org#mirrors.bfsu.edu.cn/openwrt#g' package/lean/default-settings/files/zzz-default-settings
 
 # 拉取 argon 源码
 rm -rf feeds/luci/themes/luci-theme-argon
@@ -42,7 +45,6 @@ sed -i 's/192.168.1.1/192.168.1.10/g' package/base-files/files/bin/config_genera
 sed -i 's/LEDE/OpenWrt-N1/g' package/base-files/files/bin/config_generate
 
 # Replace the default software source
-sed -i 's#openwrt.proxy.ustclug.org#mirrors.bfsu.edu.cn\\/openwrt#' package/lean/default-settings/files/zzz-default-settings
 sed -i 's/invalid users = root/#invalid users = root/g' feeds/packages/net/samba4/files/smb.conf.template
 
 # 修复部分插件自启动脚本丢失可执行权限问题
