@@ -82,7 +82,6 @@ git clone --depth=1 -b lede https://github.com/pymumu/luci-app-smartdns package/
 git clone --depth=1 https://github.com/pymumu/openwrt-smartdns package/smartdns
 
 ####     调整     ####
-sed -i '/Pass Wall/s/-1/4/g' package/openwrt-packages/small/luci-app-passwall/luasrc/controller/passwall.lua
 sed -i 's/services/vpn/g'  `grep services -rl package/openwrt-packages/small/luci-app-passwall/luasrc`
 sed -i 's/services/vpn/g'  `grep services -rl package/openwrt-packages/small/luci-app-ssr-plus/luasrc`
 
