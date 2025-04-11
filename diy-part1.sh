@@ -16,17 +16,21 @@
 # 添加feed源（使用echo追加）
 echo 'src-git passwall https://github.com/xiaorouji/openwrt-passwall' >>feeds.conf.default
 echo 'src-git fichenx https://github.com/fichenx/openwrt-package' >> feeds.conf.default
-echo 'src-git small8 https://github.com/kenzok8/small-package' >>feeds.conf.default
-
-#删除冲突插件
-./scripts/feeds update -a && rm -rf feeds/luci/applications/luci-app-mosdns
- rm -rf feeds/packages/lang/golang
- git clone https://github.com/kenzok8/golang feeds/packages/lang/golang
- ./scripts/feeds install -a 
 
 # 删除已知冲突的插件
 rm -rf feeds/packages/net/luci-app-fchomo
 rm -rf feeds/luci/applications/luci-app-bypass
+
+#删除冲突插件
+sed -i '1i src-git kenzo https://github.com/kenzok8/openwrt-packages' feeds.conf.default
+sed -i '2i src-git small https://github.com/kenzok8/small' feeds.conf.default
+./scripts/feeds update -a && rm -rf feeds/luci/applications/luci-app-mosdns && rm -rf feeds/packages/net/{alist,adguardhome,smartdns}
+rm -rf feeds/packages/lang/golang
+git clone https://github.com/kenzok8/golang feeds/packages/lang/golang
+./scripts/feeds install -a 
+make menuconfig
+
+
 
 
 # 解除系统限制
