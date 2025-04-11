@@ -16,14 +16,14 @@
 # 添加feed源（使用echo追加）
 echo 'src-git passwall https://github.com/xiaorouji/openwrt-passwall' >>feeds.conf.default
 echo 'src-git fichenx https://github.com/fichenx/openwrt-package' >> feeds.conf.default
+sed -i "/helloworld/d" "feeds.conf.default"
+echo "src-git helloworld https://github.com/fw876/helloworld.git" >> "feeds.conf.default"
 
 # 删除已知冲突的插件
 rm -rf feeds/packages/net/luci-app-fchomo
 rm -rf feeds/luci/applications/luci-app-bypass
 
 #删除冲突插件
-sed -i '1i src-git kenzo https://github.com/kenzok8/openwrt-packages' feeds.conf.default
-sed -i '2i src-git small https://github.com/kenzok8/small' feeds.conf.default
 ./scripts/feeds update -a && rm -rf feeds/luci/applications/luci-app-mosdns && rm -rf feeds/packages/net/{alist,adguardhome,smartdns}
 ./scripts/feeds install -a 
 make menuconfig
