@@ -108,8 +108,6 @@ sed -i 's/"services"/"vpn"/g'  feeds/luci/applications/luci-app-frpc/luasrc/mode
 sed -i 's/\[services\]/\[vpn\]/g'  feeds/luci/applications/luci-app-frpc/luasrc/view/frp/frp_status.htm
 
 # Alist
-rm -rf feeds/packages/lang/golang
-git clone https://github.com/sbwml/packages_lang_golang -b 23.x feeds/packages/lang/golang
 git clone https://github.com/sbwml/luci-app-alist package/alist
 
 
