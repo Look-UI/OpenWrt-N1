@@ -110,7 +110,14 @@ sed -i 's/\[services\]/\[vpn\]/g'  feeds/luci/applications/luci-app-frpc/luasrc/
 # Alist
 git clone https://github.com/sbwml/luci-app-alist package/alist
 
-
+# 删除已知冲突的插件
+rm -rf feeds/packages/net/luci-app-fchomo
+rm -rf feeds/luci/applications/luci-app-bypass
+./scripts/feeds update -a && rm -rf feeds/luci/applications/luci-app-mosdns
+rm -rf feeds/packages/lang/golang
+git clone https://github.com/kenzok8/golang feeds/packages/lang/golang
+./scripts/feeds install -a 
+make menuconfig
 
 # 修改插件名字
 sed -i 's/"管理权"/"管理"/g' `grep "管理权" -rl ./`
