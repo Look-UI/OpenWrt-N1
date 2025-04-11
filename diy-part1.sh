@@ -21,16 +21,6 @@ echo 'src-git passwall https://github.com/xiaorouji/openwrt-passwall' >>feeds.co
 echo 'src-git fichenx https://github.com/fichenx/openwrt-package' >> feeds.conf.default
 
 
-# 删除已知冲突的插件
-rm -rf feeds/packages/net/luci-app-fchomo
-rm -rf feeds/luci/applications/luci-app-bypass
-
-./scripts/feeds update -a && rm -rf feeds/luci/applications/luci-app-mosdns
-rm -rf feeds/packages/lang/golang
-git clone https://github.com/kenzok8/golang feeds/packages/lang/golang
-./scripts/feeds install -a 
-make menuconfig
-
 
 
 
