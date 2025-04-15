@@ -129,13 +129,8 @@ sed -i '/msgstr/s/"带宽监控"/"监视"/g' feeds/luci/applications/luci-app-nl
 sed -i '/msgid "Reboot"/{n;s/msgstr "重启"/msgstr "重启设备"/;}' feeds/luci/modules/luci-base/po/zh-cn/base.po
 
 
-
-
 # 删除已知冲突的插件
 rm -rf small/{luci-app-bypass,v2ray-geodata,luci-app-fchomo}
-#不编译xray-core
-sed -i 's/+xray-core//' small/luci-app-passwall2/Makefile
-
 ./scripts/feeds update -a && rm -rf feeds/luci/applications/luci-app-mosdns
 rm -rf feeds/packages/lang/golang
 git clone https://github.com/kenzok8/golang feeds/packages/lang/golang
