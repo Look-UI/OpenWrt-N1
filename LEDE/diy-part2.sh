@@ -126,10 +126,7 @@ sed -i 's/"ShadowSocksR Plus+"/"SSR Plus+"/g' `grep "ShadowSocksR Plus+" -rl ./`
 
 # 修改带宽监控
 sed -i '/msgstr/s/"带宽监控"/"监视"/g' feeds/luci/applications/luci-app-nlbwmon/po/zh-cn/nlbwmon.po
-sed -i '/msgid "Software"/{n;s/msgstr "软件包"/msgstr "软件管理"/;}' feeds/luci/modules/luci-base/po/zh-cn/base.po
-sed -i '/msgid "Administration"/{n;s/管理权/权限管理/;}' feeds/luci/modules/luci-base/po/zh_Hans/base.po
-sed -i '/msgid "Startup"/{n;s/启动项/启动管理/;}' feeds/luci/modules/luci-base/po/zh_Hans/base.po
-sed -i 's/msgstr "DHCP\/DNS"/msgstr "DHCP服务"/g' feeds/luci/modules/luci-base/po/zh_Hans/base.po
+# sed -i '/msgid "Software"/{n;s/msgstr "软件包"/msgstr "软件"/;}' feeds/luci/modules/luci-base/po/zh-cn/base.po
 sed -i '/msgid "Reboot"/{n;s/重启/重启设备/;}' feeds/luci/modules/luci-base/po/zh_Hans/base.po
 
 # 修改 Alist 的 order
