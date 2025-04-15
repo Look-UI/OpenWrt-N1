@@ -123,11 +123,22 @@ sed -i 's/"NPS 内网穿透客户端"/"NPS内网穿透"/g' `grep "NPS 内网穿�
 sed -i 's/"ShadowSocksR Plus+"/"SSR Plus+"/g' `grep "ShadowSocksR Plus+" -rl ./`
 
 
-
 # 修改带宽监控
 sed -i '/msgstr/s/"带宽监控"/"监视"/g' feeds/luci/applications/luci-app-nlbwmon/po/zh-cn/nlbwmon.po
-# 修改软件包（定位到 luci-base）
 sed -i '/msgid "Software"/{n;s/msgstr "软件包"/msgstr "软件管理"/;}' feeds/luci/modules/luci-base/po/zh-cn/base.po
+sed -i '/msgid "Administration"/{n;s/管理权/权限管理/;}' feeds/luci/modules/luci-base/po/zh_Hans/base.po
+sed -i '/msgid "Startup"/{n;s/启动项/启动管理/;}' feeds/luci/modules/luci-base/po/zh_Hans/base.po
+sed -i 's/msgstr "DHCP\/DNS"/msgstr "DHCP服务"/g' feeds/luci/modules/luci-base/po/zh_Hans/base.po
+sed -i 's/网络存储/存储/g' feeds/luci/applications/luci-app-usb-printer/po/zh_Hans/luci-app-usb-printer.po
+
+# 修改 Alist 的 order
+sed -i '/entry/s/order = [0-9]\+/order = 10/g' feeds/luci/applications/luci-app-alist/luasrc/controller/alist.lua
+
+# 修改 Aria2 的 order
+sed -i '/entry/s/order = [0-9]\+/order = 20/g' feeds/luci/applications/luci-app-aria2/luasrc/controller/aria2.lua
+
+# 修改硬盘休眠的 order
+sed -i '/entry/s/order = [0-9]\+/order = 30/g' feeds/luci/applications/luci-app-hd-idle/luasrc/controller/hd-idle.lua
 
 
 # 删除已知冲突的插件
