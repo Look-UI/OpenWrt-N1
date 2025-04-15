@@ -129,14 +129,7 @@ sed -i '/msgstr/s/"带宽监控"/"监视"/g' feeds/luci/applications/luci-app-nl
 # sed -i '/msgid "Software"/{n;s/msgstr "软件包"/msgstr "软件"/;}' feeds/luci/modules/luci-base/po/zh-cn/base.po
 sed -i '/msgid "Reboot"/{n;s/重启/重启设备/;}' feeds/luci/modules/luci-base/po/zh_Hans/base.po
 
-# 修改 Alist 的 order
-sed -i '/entry/s/order = [0-9]\+/order = 10/g' feeds/luci/applications/luci-app-alist/luasrc/controller/alist.lua
 
-# 修改 Aria2 的 order
-sed -i '/entry/s/order = [0-9]\+/order = 20/g' feeds/luci/applications/luci-app-aria2/luasrc/controller/aria2.lua
-
-# 修改硬盘休眠的 order
-sed -i '/entry/s/order = [0-9]\+/order = 30/g' feeds/luci/applications/luci-app-hd-idle/luasrc/controller/hd-idle.lua
 
 
 # 删除已知冲突的插件
