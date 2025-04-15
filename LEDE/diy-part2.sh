@@ -130,6 +130,7 @@ sed -i '/msgid "Software"/{n;s/msgstr "软件包"/msgstr "软件管理"/;}' feed
 sed -i '/msgid "Administration"/{n;s/管理权/权限管理/;}' feeds/luci/modules/luci-base/po/zh_Hans/base.po
 sed -i '/msgid "Startup"/{n;s/启动项/启动管理/;}' feeds/luci/modules/luci-base/po/zh_Hans/base.po
 sed -i 's/msgstr "DHCP\/DNS"/msgstr "DHCP服务"/g' feeds/luci/modules/luci-base/po/zh_Hans/base.po
+sed -i '/msgid "Reboot"/{n;s/重启/重启设备/;}' feeds/luci/modules/luci-base/po/zh_Hans/base.po
 
 # 修改 Alist 的 order
 sed -i '/entry/s/order = [0-9]\+/order = 10/g' feeds/luci/applications/luci-app-alist/luasrc/controller/alist.lua
