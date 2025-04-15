@@ -131,7 +131,9 @@ sed -i '/msgid "Reboot"/{n;s/msgstr "重启"/msgstr "重启设备"/;}' feeds/luc
 
 # 删除已知冲突的插件
 rm -rf small/{luci-app-bypass,v2ray-geodata,luci-app-fchomo}
-./scripts/feeds update -a && rm -rf feeds/luci/applications/luci-app-mosdns
+rm -rf feeds/luci/applications/luci-app-mosdns
+rm -rf feeds/small/luci-app-bypass
+rm -rf feeds/luci/applications/luci-app-upnp
 rm -rf feeds/packages/lang/golang
 git clone https://github.com/kenzok8/golang feeds/packages/lang/golang
 ./scripts/feeds install -a 
