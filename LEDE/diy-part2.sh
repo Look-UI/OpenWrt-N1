@@ -119,6 +119,7 @@ sed -i 's/"Npc"/"Nps内网穿透"/g' `grep "Npc" -rl ./`
 sed -i 's/"Frp 内网穿透"/"Frp内网穿透"/g' `grep "Frp 内网穿透" -rl ./`
 sed -i 's/"FTP 服务器"/"FTP服务器"/g' `grep "FTP 服务器" -rl ./`
 sed -i 's/"TTYD 终端"/"终端"/g' `grep "TTYD 终端" -rl ./`
+sed -i 's/"网络存储"/"存储"/g' `grep "网络存储" -rl ./`
 sed -i 's/"NPS 内网穿透客户端"/"NPS内网穿透"/g' `grep "NPS 内网穿透客户端" -rl ./`
 sed -i 's/"ShadowSocksR Plus+"/"SSR Plus+"/g' `grep "ShadowSocksR Plus+" -rl ./`
 
