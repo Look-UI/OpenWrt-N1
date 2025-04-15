@@ -106,14 +106,7 @@ sed -i 's/\[services\]/\[vpn\]/g'  feeds/luci/applications/luci-app-frpc/luasrc/
 # Alist
 git clone https://github.com/sbwml/luci-app-alist package/alist
 
-# 删除已知冲突的插件
-rm -rf feeds/packages/net/luci-app-fchomo
-rm -rf feeds/luci/applications/luci-app-bypass
-./scripts/feeds update -a && rm -rf feeds/luci/applications/luci-app-mosdns
-rm -rf feeds/packages/lang/golang
-git clone https://github.com/kenzok8/golang feeds/packages/lang/golang
-./scripts/feeds install -a 
-make menuconfig
+
 
 # 修改插件名字
 sed -i 's/"Argon 主题设置"/"主题设置"/g' `grep "Argon 主题设置" -rl ./`
@@ -135,3 +128,15 @@ sed -i 's/"ShadowSocksR Plus+"/"SSR Plus+"/g' `grep "ShadowSocksR Plus+" -rl ./`
 sed -i '/msgstr/s/"带宽监控"/"监视"/g' feeds/luci/applications/luci-app-nlbwmon/po/zh-cn/nlbwmon.po
 # 修改软件包（定位到 luci-base）
 sed -i '/msgid "Software"/{n;s/msgstr "软件包"/msgstr "软件管理"/;}' feeds/luci/modules/luci-base/po/zh-cn/base.po
+
+
+# 删除已知冲突的插件
+rm -rf small/{luci-app-bypass,v2ray-geodata,luci-app-fchomo}
+#不编译xray-core
+sed -i 's/+xray-core//' small/luci-app-passwall2/Makefile
+
+./scripts/feeds update -a && rm -rf feeds/luci/applications/luci-app-mosdns
+rm -rf feeds/packages/lang/golang
+git clone https://github.com/kenzok8/golang feeds/packages/lang/golang
+./scripts/feeds install -a 
+make menuconfig
