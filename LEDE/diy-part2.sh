@@ -126,8 +126,7 @@ sed -i 's/"ShadowSocksR Plus+"/"SSR Plus+"/g' `grep "ShadowSocksR Plus+" -rl ./`
 
 # 修改带宽监控
 sed -i '/msgstr/s/"带宽监控"/"监视"/g' feeds/luci/applications/luci-app-nlbwmon/po/zh-cn/nlbwmon.po
-# sed -i '/msgid "Software"/{n;s/msgstr "软件包"/msgstr "软件"/;}' feeds/luci/modules/luci-base/po/zh-cn/base.po
-sed -i '/msgid "Reboot"/{n;s/重启/重启设备/;}' feeds/luci/modules/luci-base/po/zh_Hans/base.po
+sed -i '/msgid "Reboot"/{n;s/msgstr "重启"/msgstr "重启设备"/;}' feeds/luci/modules/luci-base/po/zh-cn/base.po
 
 
 
