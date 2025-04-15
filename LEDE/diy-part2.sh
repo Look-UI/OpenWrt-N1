@@ -10,6 +10,16 @@
 # Description: OpenWrt DIY script part 2 (After Update feeds)
 #
 
+# 删除已知冲突的插件
+rm -rf small/{luci-app-bypass,v2ray-geodata,luci-app-fchomo}
+sed -i '1i src-git smpackage https://github.com/kenzok8/small-package' feeds.conf.default
+./scripts/feeds update -a && rm -rf feeds/luci/applications/luci-app-mosdns && rm -rf feeds/packages/net/{alist,adguardhome,smartdns}
+rm -rf feeds/smpackage/{base-files,dnsmasq,firewall*,fullconenat,libnftnl,nftables,ppp,opkg,ucl,upx,vsftpd-alt,miniupnpd-iptables,wireless-regdb}
+rm -rf feeds/packages/lang/golang
+git clone https://github.com/kenzok8/golang feeds/packages/lang/golang
+./scripts/feeds install -a 
+make menuconfig
+
 # TTYD 免登录
 sed -i 's|/bin/login|/bin/login -f root|g' feeds/packages/utils/ttyd/files/ttyd.config
 
@@ -129,12 +139,4 @@ sed -i '/msgstr/s/"带宽监控"/"监视"/g' feeds/luci/applications/luci-app-nl
 sed -i '/msgid "Reboot"/{n;s/msgstr "重启"/msgstr "重启设备"/;}' feeds/luci/modules/luci-base/po/zh-cn/base.po
 
 
-# 删除已知冲突的插件
-rm -rf small/{luci-app-bypass,v2ray-geodata,luci-app-fchomo}
-rm -rf feeds/luci/applications/luci-app-mosdns
-rm -rf feeds/small/luci-app-bypass
-rm -rf feeds/luci/applications/luci-app-upnp
-rm -rf feeds/packages/lang/golang
-git clone https://github.com/kenzok8/golang feeds/packages/lang/golang
-./scripts/feeds install -a 
-make menuconfig
+
