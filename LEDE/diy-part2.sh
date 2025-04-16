@@ -65,7 +65,7 @@ sed -i '/\* \* \* \/etc\/coremark.sh/d' feeds/packages/utils/coremark/*
 git clone --depth=1 https://github.com/danchexiaoyang/luci-app-onliner.git package/luci-app-onliner
 
 ## DDNSGO
-git clone https://github.com/sirpdboy/luci-app-ddns-go.git package/ddns-go
+# git clone https://github.com/sirpdboy/luci-app-ddns-go.git package/ddns-go
 
 # 通知插件
 git clone https://github.com/tty228/luci-app-serverchan.git package/luci-app-serverchan
