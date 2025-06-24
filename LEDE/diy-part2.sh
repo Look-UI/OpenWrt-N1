@@ -137,7 +137,7 @@ rm -rf feeds/packages/net/qBittorrent
 rm -rf package/small-package/luci-app-netdata
 
 # 删除已知冲突的插件
-rm -rf small/{luci-app-bypass,v2ray-geodata,luci-app-fchomo}
+rm -rf small/{luci-app-bypass,luci-app-fchomo}
 
 # golang版本修复
 rm -rf feeds/packages/lang/golang
