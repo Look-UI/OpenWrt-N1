@@ -66,7 +66,8 @@ git clone --depth=1 https://github.com/danchexiaoyang/luci-app-onliner.git packa
 
 ## DDNSGO
 rm -rf package/small-package/luci-app-ddns-go
-git clone https://github.com/sirpdboy/luci-app-ddns-go.git package/ddns-go
+# 克隆 LUA 分支
+git clone -b LUA https://github.com/sirpdboy/luci-app-ddns-go.git package/ddns-go
 
 # 通知插件
 git clone https://github.com/tty228/luci-app-serverchan.git package/luci-app-serverchan
