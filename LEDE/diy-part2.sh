@@ -147,5 +147,6 @@ git clone https://github.com/sbwml/packages_lang_golang feeds/packages/lang/gola
 # mosdns
 find ./ | grep Makefile | grep v2ray-geodata | xargs rm -f
 find ./ | grep Makefile | grep mosdns | xargs rm -f
+rm -rf feeds/packages/net/mosdns feeds/packages/net/v2ray-geodata
 git clone https://github.com/sbwml/luci-app-mosdns package/mosdns
 git clone https://github.com/sbwml/v2ray-geodata package/geodata
