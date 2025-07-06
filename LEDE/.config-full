@@ -124,7 +124,7 @@ CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Simple_Obfs=y               # 流量混
 
 # DNS防污染
 CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_ChinaDNS_NG=y               # 国内DNS优化
-CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Dns2socks=y                 # DNS over SOCKS5
+# CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_Dns2socks is not set      
 CONFIG_PACKAGE_luci-app-ssr-plus_INCLUDE_V2ray_Plugin=y              # V2Ray插件（WebSocket+TLS）
 
 # 禁用无关选项（避免冲突）
