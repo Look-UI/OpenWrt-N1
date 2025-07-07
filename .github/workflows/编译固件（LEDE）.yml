@@ -141,34 +141,12 @@ jobs:
         [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
         echo "FILE_DATE=_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
 
-    - name: 清理磁盘空间
-      if: (!cancelled())
-      run: |
-        echo "清理之前："
-        df -hT
-        mkdir openwrt-armvirt
-        mkdir /workdir/upload
-        cp openwrt/bin/targets/*/*/*.tar.gz /workdir/upload/
-        mv openwrt/bin/targets/*/*/*.tar.gz openwrt-armvirt/
-        echo -e "\n"
-        echo "列出空间占用前10的目录或文件："
-        sudo du -h --max-depth=1 /workdir |sort -nr | head -10
-        rm -rf /workdir/openwrt/ && sync
-        echo -e "\n"
-        echo "清理之后："
-        df -hT
-        echo -e "\n"
-        echo "/workdir路径文件"
-        ls -l
-        echo -e "\n"
-        echo "列出空间占用前10的目录或文件："
-        sudo du -h --max-depth=1 /workdir |sort -nr | head -10
 
     - name: 打包内核
       uses: unifreq/openwrt_packit@master
       env:
         WHOAMI: deng
-        OPENWRT_ARMVIRT: openwrt-armvirt/*.tar.gz
+        openwrt_path: openwrt/bin/targets/*/*/*rootfs.tar.gz
         PACKAGE_SOC: s905d
        # KERNEL_AUTO_LATEST: false
        # KERNEL_REPO_URL: https://github.com/quanjindeng/Actions_OpenWrt-Amlogic/tree/main/kernel
@@ -205,7 +183,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.repository }}
           keep_minimum_runs: 0
-          retain_days: 7
+          retain_days: 15
           #retain_days: ${{ github.event.inputs.action_days }}
     
     - name: 删除多余releases
