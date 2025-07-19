@@ -81,6 +81,10 @@ sed -i 's#opt/kernel#kernel#g' package/luci-app-amlogic/luci-app-amlogic/root/et
 # Add luci-app-adguardhome
 git clone https://github.com/rufengsuixing/luci-app-adguardhome.git package/luci-app-adguardhome
 
+# Add luci-app-homeproxy
+rm -rf package/luci-app-homeproxy
+git_clone https://github.com/immortalwrt/homeproxy luci-app-homeproxy
+
 # 添加 smartdns
 git clone --depth=1 -b lede https://github.com/pymumu/luci-app-smartdns package/luci-app-smartdns
 git clone --depth=1 https://github.com/pymumu/openwrt-smartdns package/smartdns
