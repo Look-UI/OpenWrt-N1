@@ -18,17 +18,3 @@ echo 'src-git kenzo https://github.com/kenzok8/openwrt-packages' >> feeds.conf.d
 echo 'src-git small https://github.com/kenzok8/small' >> feeds.conf.default
 echo 'src-git passwall https://github.com/xiaorouji/openwrt-passwall' >>feeds.conf.default
 echo 'src-git fichenx https://github.com/fichenx/openwrt-package' >> feeds.conf.default
-
-
-
-
-
-# 解除系统限制
-for limit in u n d m s t v; do
-  case $limit in
-    u) ulimit -u 10000 ;;
-    n) ulimit -n 4096 ;;
-    *) ulimit -${limit} unlimited ;;
-  esac
-done
-
