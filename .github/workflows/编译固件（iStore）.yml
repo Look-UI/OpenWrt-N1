@@ -71,13 +71,24 @@ jobs:
         echo "硬盘详情："
         df -Th
         
+    - name: 创建虚拟内存
+      run: |
+        # 先清理可能存在的旧swap文件
+        sudo swapoff -a 2>/dev/null || true
+        sudo rm -f /mnt/swapfile /swapfile 2>/dev/null || true
+        
+        # 创建新的swap文件
+        sudo dd if=/dev/zero of=/mnt/swapfile bs=1M count=8192
+        sudo chmod 600 /mnt/swapfile
+        sudo mkswap /mnt/swapfile
+        sudo swapon /mnt/swapfile
+        free -h | grep -i swap
+
     - name: 初始化编译环境
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
         # 清理系统资源
-        sudo swapoff -a
-        sudo rm -f /swapfile /mnt/swapfile
         sudo docker image prune -a -f
         sudo systemctl stop docker
         sudo snap set system refresh.retain=2

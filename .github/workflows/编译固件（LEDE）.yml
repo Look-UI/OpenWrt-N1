@@ -40,6 +40,11 @@ jobs:
         
     - name: 创建虚拟内存
       run: |
+        # 先清理可能存在的旧swap文件
+        sudo swapoff -a 2>/dev/null || true
+        sudo rm -f /mnt/swapfile /swapfile 2>/dev/null || true
+        
+        # 创建新的swap文件
         sudo dd if=/dev/zero of=/mnt/swapfile bs=1M count=8192
         sudo chmod 600 /mnt/swapfile
         sudo mkswap /mnt/swapfile
