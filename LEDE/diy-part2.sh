@@ -83,11 +83,38 @@ git clone https://github.com/rufengsuixing/luci-app-adguardhome.git package/luci
 
 # Add luci-app-homeproxy
 rm -rf package/luci-app-homeproxy
-git_clone https://github.com/immortalwrt/homeproxy luci-app-homeproxy
+git clone https://github.com/immortalwrt/homeproxy package/luci-app-homeproxy
 
 # 添加 smartdns
 git clone --depth=1 -b lede https://github.com/pymumu/luci-app-smartdns package/luci-app-smartdns
 git clone --depth=1 https://github.com/pymumu/openwrt-smartdns package/smartdns
+
+# 修复 v2ray-geodata 依赖问题
+rm -rf feeds/packages/net/v2ray-geodata
+rm -rf package/feeds/packages/v2ray-geodata
+git clone https://github.com/sbwml/v2ray-geodata package/v2ray-geodata
+
+# 修复循环依赖问题
+# 修复 luci-app-bypass 循环依赖
+sed -i 's/depends on iptables/depends on iptables \&\& !PACKAGE_luci-app-passwall_Iptables_Transparent_Proxy/g' feeds/small/luci-app-bypass/Makefile 2>/dev/null || true
+
+# 修复 natmap 自依赖
+sed -i 's/select natmap/select natmap \&\& !PACKAGE_natmap/g' feeds/small/natmap/Makefile 2>/dev/null || true
+
+# 修复 baresip 循环依赖
+sed -i 's/depends on baresip-mod-avcodec/depends on baresip-mod-avcodec \&\& !PACKAGE_baresip-mod-avformat/g' feeds/packages/net/baresip-mod-avformat/Makefile 2>/dev/null || true
+
+# 修复 miniupnpd 自依赖
+sed -i 's/select miniupnpd/select miniupnpd \&\& !PACKAGE_miniupnpd/g' feeds/packages/net/miniupnpd/Makefile 2>/dev/null || true
+
+# 修复 tor 循环依赖
+sed -i 's/depends on tor/depends on tor \&\& !PACKAGE_luci-app-torbp/g' feeds/small/luci-app-torbp/Makefile 2>/dev/null || true
+
+# 修复 mentohust 自依赖
+sed -i 's/select mentohust/select mentohust \&\& !PACKAGE_mentohust/g' feeds/packages/net/mentohust/Makefile 2>/dev/null || true
+
+# 修复 kmod-oaf 自依赖
+sed -i 's/select kmod-oaf/select kmod-oaf \&\& !PACKAGE_kmod-oaf/g' feeds/packages/kernel/kmod-oaf/Makefile 2>/dev/null || true
 
 
 # 调整部分插件到nas菜单
