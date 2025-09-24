@@ -178,6 +178,30 @@ jobs:
         echo "硬盘详情："
         df -Th
 
+    - name: 检查编译配置
+      run: |
+        cd openwrt
+        echo "编译前配置检查："
+        echo "目标架构："
+        grep "^CONFIG_TARGET" .config | head -10
+        echo "设备配置："
+        grep "^CONFIG_TARGET.*DEVICE" .config
+        echo "固件类型："
+        grep "^CONFIG_TARGET_IMAGES" .config
+        
+        # 强制确保armvirt架构
+        echo "强制设置armvirt架构..."
+        sed -i 's/^# CONFIG_TARGET_armvirt is not set/CONFIG_TARGET_armvirt=y/' .config
+        sed -i 's/^# CONFIG_TARGET_armvirt_64 is not set/CONFIG_TARGET_armvirt_64=y/' .config
+        sed -i 's/^# CONFIG_TARGET_armvirt_64_DEVICE_generic is not set/CONFIG_TARGET_armvirt_64_DEVICE_generic=y/' .config
+        
+        # 禁用x86架构
+        sed -i 's/^CONFIG_TARGET_x86=y/# CONFIG_TARGET_x86 is not set/' .config
+        sed -i 's/^CONFIG_TARGET_x86_64=y/# CONFIG_TARGET_x86_64 is not set/' .config
+        
+        echo "修复后配置检查："
+        grep "^CONFIG_TARGET" .config | head -10
+        
     - name: 编译固件
       id: compile
       run: |
@@ -210,19 +234,37 @@ jobs:
       id: organize
       if: steps.compile.outputs.status == 'success' && !cancelled()
       run: |
-        cd $GITHUB_WORKSPACE/openwrt/bin/packages
-        tar -zcvf Packages.tar.gz ./*
-        cp Packages.tar.gz $GITHUB_WORKSPACE/openwrt/bin/targets/*/*
-        cd $GITHUB_WORKSPACE/openwrt/bin/targets/*/*
-        rm -rf packages
-        echo "FIRMWARE=$PWD" >> $GITHUB_ENV
-        echo "status=success" >> ${GITHUB_OUTPUT}
+        # 检查实际的输出目录结构
+        echo "检查bin目录结构："
+        find $GITHUB_WORKSPACE/openwrt/bin -type d 2>/dev/null | head -20
         
-        # 检查armvirt架构的输出文件
-        echo "检查armvirt输出文件："
-        ls -la $PWD/
+        # 查找armvirt相关的目录
+        echo "查找armvirt相关目录："
+        find $GITHUB_WORKSPACE/openwrt/bin -name "*armvirt*" -o -name "*arm*" 2>/dev/null
+        
+        # 查找所有可能的固件文件
         echo "查找所有固件文件："
-        find $PWD -type f \( -name "*.tar.gz" -o -name "*.img" -o -name "*.bin" -o -name "*.zip" -o -name "*.gz" \) 2>/dev/null
+        find $GITHUB_WORKSPACE/openwrt/bin -type f \( -name "*.tar.gz" -o -name "*.img" -o -name "*.bin" -o -name "*.zip" -o -name "*.gz" \) 2>/dev/null
+        
+        # 尝试找到正确的目标目录
+        TARGET_DIR=$(find $GITHUB_WORKSPACE/openwrt/bin/targets -type d -name "*armvirt*" 2>/dev/null | head -1)
+        if [ -z "$TARGET_DIR" ]; then
+            TARGET_DIR=$(find $GITHUB_WORKSPACE/openwrt/bin/targets -type d 2>/dev/null | head -1)
+        fi
+        
+        if [ -n "$TARGET_DIR" ]; then
+            echo "使用目标目录: $TARGET_DIR"
+            cd $TARGET_DIR
+            echo "FIRMWARE=$PWD" >> $GITHUB_ENV
+            echo "status=success" >> ${GITHUB_OUTPUT}
+            
+            # 检查目标目录内容
+            echo "目标目录内容："
+            ls -la $PWD/
+        else
+            echo "未找到目标目录，使用默认处理"
+            echo "status=failed" >> ${GITHUB_OUTPUT}
+        fi
         
         echo -e "\n"
         echo "列出空间占用前10的目录或文件："
