@@ -200,11 +200,11 @@ jobs:
         echo "固件类型："
         grep "^CONFIG_TARGET_IMAGES" .config
         
-        # 强制确保armsr架构
-        echo "强制设置armsr架构..."
-        sed -i 's/^# CONFIG_TARGET_armsr is not set/CONFIG_TARGET_armsr=y/' .config
-        sed -i 's/^# CONFIG_TARGET_armsr_armv8 is not set/CONFIG_TARGET_armsr_armv8=y/' .config
-        sed -i 's/^# CONFIG_TARGET_armsr_armv8_DEVICE_generic is not set/CONFIG_TARGET_armsr_armv8_DEVICE_generic=y/' .config
+        # 强制确保armvirt架构
+        echo "强制设置armvirt架构..."
+        sed -i 's/^# CONFIG_TARGET_armvirt is not set/CONFIG_TARGET_armvirt=y/' .config
+        sed -i 's/^# CONFIG_TARGET_armvirt_64 is not set/CONFIG_TARGET_armvirt_64=y/' .config
+        sed -i 's/^# CONFIG_TARGET_armvirt_64_DEVICE_generic is not set/CONFIG_TARGET_armvirt_64_DEVICE_generic=y/' .config
         
         # 禁用x86架构
         sed -i 's/^CONFIG_TARGET_x86=y/# CONFIG_TARGET_x86 is not set/' .config
@@ -249,18 +249,18 @@ jobs:
         echo "检查bin目录结构："
         find $GITHUB_WORKSPACE/openwrt/bin -type d 2>/dev/null | head -20
         
-        # 查找armsr相关的目录
-        echo "查找armsr相关目录："
-        find $GITHUB_WORKSPACE/openwrt/bin -name "*armsr*" -o -name "*armv8*" -o -name "*arm*" 2>/dev/null
+        # 查找armvirt相关的目录
+        echo "查找armvirt相关目录："
+        find $GITHUB_WORKSPACE/openwrt/bin -name "*armvirt*" -o -name "*arm*" 2>/dev/null
         
         # 查找所有可能的固件文件
         echo "查找所有固件文件："
         find $GITHUB_WORKSPACE/openwrt/bin -type f \( -name "*.tar.gz" -o -name "*.img" -o -name "*.bin" -o -name "*.zip" -o -name "*.gz" \) 2>/dev/null
         
         # 尝试找到正确的目标目录
-        TARGET_DIR=$(find $GITHUB_WORKSPACE/openwrt/bin/targets -type d -name "*armsr*" 2>/dev/null | head -1)
+        TARGET_DIR=$(find $GITHUB_WORKSPACE/openwrt/bin/targets -type d -name "*armvirt*" 2>/dev/null | head -1)
         if [ -z "$TARGET_DIR" ]; then
-            TARGET_DIR=$(find $GITHUB_WORKSPACE/openwrt/bin/targets -type d -name "*armv8*" 2>/dev/null | head -1)
+            TARGET_DIR=$(find $GITHUB_WORKSPACE/openwrt/bin/targets -type d -name "*arm*" 2>/dev/null | head -1)
         fi
         if [ -z "$TARGET_DIR" ]; then
             TARGET_DIR=$(find $GITHUB_WORKSPACE/openwrt/bin/targets -type d 2>/dev/null | head -1)
