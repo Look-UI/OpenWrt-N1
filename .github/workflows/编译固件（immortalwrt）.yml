@@ -149,34 +149,8 @@ jobs:
       run: |
         echo "清理之前："
         df -hT
-        mkdir -p openwrt-armvirt
-        mkdir -p /workdir/upload
-        
-        # 详细检查编译输出目录
-        echo "检查编译输出目录结构："
-        find openwrt/bin -type d 2>/dev/null | head -20
-        echo "查找所有可能的固件文件："
-        find openwrt/bin -type f \( -name "*.tar.gz" -o -name "*.img" -o -name "*.bin" -o -name "*.zip" -o -name "*.gz" \) 2>/dev/null | head -20
-        
-        # 检查并复制 .tar.gz 文件
-        if ls openwrt/bin/targets/*/*/*.tar.gz 1> /dev/null 2>&1; then
-            echo "找到 .tar.gz 文件，正在复制..."
-            mv openwrt/bin/targets/*/*/*.tar.gz openwrt-armvirt/
-        else
-            echo "未找到 .tar.gz 文件，检查是否有其他格式的文件..."
-            # 查找其他可能的文件格式
-            find openwrt/bin/targets -type f \( -name "*.img" -o -name "*.bin" -o -name "*.zip" -o -name "*.gz" \) 2>/dev/null | while read file; do
-                echo "移动文件: $file"
-                mv "$file" openwrt-armvirt/
-            done
-        fi
-        
-        # 如果仍然没有找到任何文件，创建一个空的占位符文件
-        if [ -z "$(ls -A openwrt-armvirt/ 2>/dev/null)" ]; then
-            echo "未找到任何固件文件，创建占位符文件..."
-            echo "No firmware files were generated during the build process." > openwrt-armvirt/README.md
-        fi
-        
+        mkdir openwrt-armvirt
+        mv openwrt/bin/targets/*/*/*.tar.gz openwrt-armvirt/
         echo -e "\n"
         echo "列出空间占用前10的目录或文件："
         sudo du -h --max-depth=1 /workdir/openwrt |sort -nr | head -10
@@ -186,7 +160,7 @@ jobs:
         df -hT
         echo -e "\n"
         echo "当前路径文件"
-        ls -l openwrt-armvirt/
+        ls -l
         echo -e "\n"
         echo "列出空间占用前10的目录或文件："
         sudo du -h --max-depth=1 /workdir/openwrt |sort -nr | head -10

@@ -200,18 +200,6 @@ jobs:
         echo "固件类型："
         grep "^CONFIG_TARGET_IMAGES" .config
         
-        # 强制确保armvirt架构
-        echo "强制设置armvirt架构..."
-        sed -i 's/^# CONFIG_TARGET_armvirt is not set/CONFIG_TARGET_armvirt=y/' .config
-        sed -i 's/^# CONFIG_TARGET_armvirt_64 is not set/CONFIG_TARGET_armvirt_64=y/' .config
-        sed -i 's/^# CONFIG_TARGET_armvirt_64_DEVICE_generic is not set/CONFIG_TARGET_armvirt_64_DEVICE_generic=y/' .config
-        
-        # 禁用x86架构
-        sed -i 's/^CONFIG_TARGET_x86=y/# CONFIG_TARGET_x86 is not set/' .config
-        sed -i 's/^CONFIG_TARGET_x86_64=y/# CONFIG_TARGET_x86_64 is not set/' .config
-        
-        echo "修复后配置检查："
-        grep "^CONFIG_TARGET" .config | head -10
         
     - name: 编译固件
       id: compile
@@ -223,76 +211,28 @@ jobs:
         grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
         [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
         echo "FILE_DATE=_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
-        
-        # 编译后检查输出文件
-        echo "编译完成，检查输出文件："
-        echo "bin目录结构："
-        find bin -type d 2>/dev/null | head -10
-        echo "所有固件文件："
-        find bin -type f \( -name "*.tar.gz" -o -name "*.img" -o -name "*.bin" -o -name "*.zip" -o -name "*.gz" \) 2>/dev/null
-        echo "targets目录内容："
-        ls -la bin/targets/ 2>/dev/null || echo "targets目录不存在"
 
-    - name: 清理服务器空间
-      if: steps.compile.outputs.status == 'success' && !cancelled()
+        
+    - name: 清理磁盘空间
+      if: (!cancelled())
       run: |
-        cd openwrt/
-        # 清理编译过程中的临时文件，保留bin目录
-        rm -rf $(ls . | grep -v "^bin$" | xargs) 2>/dev/null
-        df -hT ${PWD}
-
-    - name: 整理文件
-      id: organize
-      if: steps.compile.outputs.status == 'success' && !cancelled()
-      run: |
-        # 检查实际的输出目录结构
-        echo "检查bin目录结构："
-        find $GITHUB_WORKSPACE/openwrt/bin -type d 2>/dev/null | head -20
-        
-        # 查找armvirt相关的目录
-        echo "查找armvirt相关目录："
-        find $GITHUB_WORKSPACE/openwrt/bin -name "*armvirt*" -o -name "*arm*" 2>/dev/null
-        
-        # 查找所有可能的固件文件
-        echo "查找所有固件文件："
-        find $GITHUB_WORKSPACE/openwrt/bin -type f \( -name "*.tar.gz" -o -name "*.img" -o -name "*.bin" -o -name "*.zip" -o -name "*.gz" \) 2>/dev/null
-        
-        # 尝试找到正确的目标目录
-        TARGET_DIR=$(find $GITHUB_WORKSPACE/openwrt/bin/targets -type d -name "*armvirt*" 2>/dev/null | head -1)
-        if [ -z "$TARGET_DIR" ]; then
-            TARGET_DIR=$(find $GITHUB_WORKSPACE/openwrt/bin/targets -type d -name "*arm*" 2>/dev/null | head -1)
-        fi
-        if [ -z "$TARGET_DIR" ]; then
-            TARGET_DIR=$(find $GITHUB_WORKSPACE/openwrt/bin/targets -type d 2>/dev/null | head -1)
-        fi
-        
-        if [ -n "$TARGET_DIR" ]; then
-            echo "使用目标目录: $TARGET_DIR"
-            cd $TARGET_DIR
-            echo "FIRMWARE=$PWD" >> $GITHUB_ENV
-            echo "status=success" >> ${GITHUB_OUTPUT}
-            
-            # 检查目标目录内容
-            echo "目标目录内容："
-            ls -la $PWD/
-        else
-            echo "未找到目标目录，使用默认处理"
-            echo "status=failed" >> ${GITHUB_OUTPUT}
-        fi
-        
+        echo "清理之前："
+        df -hT
+        mkdir openwrt-armvirt
+        mv openwrt/bin/targets/*/*/*.tar.gz openwrt-armvirt/
         echo -e "\n"
         echo "列出空间占用前10的目录或文件："
-        sudo du -h --max-depth=1 /workdir |sort -nr | head -10
-        rm -rf /workdir/openwrt/ && sync
+        sudo du -h --max-depth=1 /workdir/openwrt |sort -nr | head -10
+        rm -rf /workdir/openwrt/*
         echo -e "\n"
         echo "清理之后："
         df -hT
         echo -e "\n"
-        echo "/workdir路径文件"
-        ls -l /workdir/
+        echo "当前路径文件"
+        ls -l
         echo -e "\n"
         echo "列出空间占用前10的目录或文件："
-        sudo du -h --max-depth=1 /workdir |sort -nr | head -10
+        sudo du -h --max-depth=1 /workdir/openwrt |sort -nr | head -10
 
     - name: 打包内核
       uses: unifreq/openwrt_packit@master
