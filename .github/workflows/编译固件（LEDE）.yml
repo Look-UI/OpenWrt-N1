@@ -213,11 +213,21 @@ jobs:
         echo "修复后配置检查："
         grep "^CONFIG_TARGET" .config | head -10
         
+    - name: 监控编译空间
+      run: |
+        echo "编译前空间检查："
+        df -h
+        echo "当前目录大小："
+        du -sh /workdir/openwrt 2>/dev/null || echo "目录不存在"
+        
     - name: 编译固件
       id: compile
       run: |
         cd openwrt
         echo -e "$(nproc) thread compile"
+        # 清理一些不必要的文件以节省空间
+        find . -name "*.o" -delete 2>/dev/null || true
+        find . -name "*.a" -delete 2>/dev/null || true
         make -j$(nproc) || make -j1 || make -j1 V=s
         echo "status=success" >> $GITHUB_OUTPUT
         grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
