@@ -188,30 +188,6 @@ jobs:
         find dl -size -1024c -exec rm -f {} \;
         echo "硬盘详情："
         df -Th
-
-    - name: 检查编译配置
-      run: |
-        cd openwrt
-        echo "编译前配置检查："
-        echo "目标架构："
-        grep "^CONFIG_TARGET" .config | head -10
-        echo "设备配置："
-        grep "^CONFIG_TARGET.*DEVICE" .config
-        echo "固件类型："
-        grep "^CONFIG_TARGET_IMAGES" .config
-        
-        # 确保使用armvirt架构
-        echo "确保armvirt架构配置..."
-        sed -i 's/^# CONFIG_TARGET_armvirt is not set/CONFIG_TARGET_armvirt=y/' .config
-        sed -i 's/^# CONFIG_TARGET_armvirt_64 is not set/CONFIG_TARGET_armvirt_64=y/' .config
-        sed -i 's/^# CONFIG_TARGET_armvirt_64_DEVICE_generic is not set/CONFIG_TARGET_armvirt_64_DEVICE_generic=y/' .config
-        
-        # 禁用x86架构
-        sed -i 's/^CONFIG_TARGET_x86=y/# CONFIG_TARGET_x86 is not set/' .config
-        sed -i 's/^CONFIG_TARGET_x86_64=y/# CONFIG_TARGET_x86_64 is not set/' .config
-        
-        echo "修复后配置检查："
-        grep "^CONFIG_TARGET" .config | head -10
         
     - name: 监控编译空间
       run: |
