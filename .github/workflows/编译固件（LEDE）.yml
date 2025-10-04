@@ -204,8 +204,26 @@ jobs:
         # 清理一些不必要的文件以节省空间
         find . -name "*.o" -delete 2>/dev/null || true
         find . -name "*.a" -delete 2>/dev/null || true
-        make -j$(nproc) || make -j1 || make -j1 V=s
-        echo "status=success" >> $GITHUB_OUTPUT
+        
+        # 添加编译错误处理
+        echo "开始编译..."
+        if make -j$(nproc) 2>&1 | tee compile.log; then
+          echo "编译成功"
+          echo "status=success" >> $GITHUB_OUTPUT
+        else
+          echo "编译失败，尝试单线程编译..."
+          if make -j1 2>&1 | tee compile-single.log; then
+            echo "单线程编译成功"
+            echo "status=success" >> $GITHUB_OUTPUT
+          else
+            echo "单线程编译也失败，尝试详细模式..."
+            make -j1 V=s 2>&1 | tee compile-verbose.log || true
+            echo "status=failed" >> $GITHUB_OUTPUT
+            echo "编译失败，请检查日志"
+            exit 1
+          fi
+        fi
+        
         grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
         [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
         echo "FILE_DATE=_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
