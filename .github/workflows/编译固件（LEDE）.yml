@@ -1,0 +1,307 @@
+#
+# Copyright (c) 2019-2020 P3TERX <https://p3terx.com>
+#
+# This is free software, licensed under the MIT License.
+# See /LICENSE for more information.
+#
+# https://github.com/P3TERX/Actions-OpenWrt
+# Description: Build OpenWrt using GitHub Actions
+#
+# 优化调整 by https://github.com/quanjindeng/Actions_OpenWrt-Amlogic
+#
+
+name: 编译固件（LEDE）
+
+on:
+  repository_dispatch:
+  workflow_dispatch:
+
+  schedule:
+    - cron: 0 16 * * 4
+
+env:
+  REPO_URL: https://github.com/coolsnowwolf/lede
+  REPO_BRANCH: master
+  FEEDS_CONF: LEDE/feeds.conf.default
+  CONFIG_FILE: LEDE/.config-full
+  DIY_P1_SH: diy-part1.sh
+  DIY_P2_SH: LEDE/diy-part2.sh
+  TZ: Asia/Shanghai
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: 创建编译空间挂载点
+      run: |
+        sudo mkdir -p /workdir
+        sudo chown $USER:$GROUPS /workdir
+        
+    - name: 创建虚拟内存
+      run: |
+        # 先清理可能存在的旧swap文件
+        sudo swapoff -a 2>/dev/null || true
+        sudo rm -f /mnt/swapfile /swapfile 2>/dev/null || true
+        
+        # 创建新的swap文件
+        sudo dd if=/dev/zero of=/mnt/swapfile bs=1M count=8192
+        sudo chmod 600 /mnt/swapfile
+        sudo mkswap /mnt/swapfile
+        sudo swapon /mnt/swapfile
+        free -h | grep -i swap
+
+    - name: 创建模拟物理磁盘
+      run: |
+        mnt_size=$(expr $(df -h /mnt | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 1)
+        root_size=$(expr $(df -h / | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 4)
+        sudo truncate -s "${mnt_size}"G /mnt/mnt.img
+        sudo truncate -s "${root_size}"G /root.img
+        sudo losetup /dev/loop6 /mnt/mnt.img
+        sudo losetup /dev/loop7 /root.img
+        sudo pvcreate /dev/loop6
+        sudo pvcreate /dev/loop7
+        sudo vgcreate github /dev/loop6 /dev/loop7
+        sudo lvcreate -n runner -l 100%FREE github
+        sudo mkfs.xfs /dev/github/runner
+        sudo mkdir -p /workdir
+        sudo mount /dev/github/runner /workdir
+        sudo chown -R runner.runner /workdir
+        df -Th
+          
+    - name: 检查Actions
+      uses: actions/checkout@v4
+    
+    - name: 检查服务器配置
+      run: |
+        echo "警告⚠"
+        echo "若分配的服务器性能不足，务必及时取消，重新运行！"
+        echo "已知编译成功CPU型号：8370C,8171M"
+        echo "已知性能不足CPU型号：8272CL"
+        echo -e "-------------- ------------CPU信息------------------------------------------\n"
+        echo "CPU物理数量:$(cat /proc/cpuinfo| grep "physical id"| sort| uniq| wc -l)"
+        echo -e "CPU核心及版本信息：$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
+        echo "-------------------------------内存信息-------------------------------------------"
+        echo "已安装内存详细信息："
+        sudo lshw -short -C memory | grep GiB
+        echo -e "\n"
+        echo "-----------------------------硬盘信息---------------------------------------------"
+        echo -e  "硬盘数量：$(ls /dev/sd* | grep -v [1-9] | wc -l) \n"
+        echo "硬盘详情："
+        df -Th
+        
+        # 检查编译环境
+        echo "-----------------------------编译环境检查---------------------------------------------"
+        echo "检查必要的编译工具："
+        which gcc g++ make cmake || echo "缺少编译工具"
+        echo "检查磁盘空间："
+        df -h | grep -E "(Filesystem|/dev/|/mnt/)"
+        echo "检查内存使用："
+        free -h
+        echo "检查CPU负载："
+        uptime
+
+    - name: 初始化编译环境
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        # 清理系统资源
+        sudo swapoff -a
+        sudo rm -f /swapfile /mnt/swapfile
+        sudo docker image prune -a -f
+        sudo systemctl stop docker
+        sudo snap set system refresh.retain=2
+        sudo rm -rf /usr/share/dotnet /etc/apt/sources.list.d /usr/local/lib/android 2>/dev/null
+        sudo sed -i '/NVM_DIR/d;/skel/d' /root/{.bashrc,.profile}
+        sudo -E apt-get -qq purge azure-cli ghc* zulu* llvm* firefox google* dotnet* powershell openjdk* mongodb* moby* || true
+        [[ -n "${AGENT_TOOLSDIRECTORY}" ]] && sudo rm -rf "${AGENT_TOOLSDIRECTORY}"
+        
+        # 安装依赖
+        sudo -E apt-get -qq update
+        sudo -E apt-get -qq install $(curl -fsSL https://tinyurl.com/ubuntu2204-make-openwrt)
+        sudo -E apt-get -qq install libfuse-dev lib32z1-dev libpcre3 libpcre3-dev clang
+        sudo -E apt-get -qq autoremove --purge
+        sudo -E systemctl daemon-reload
+        sudo -E apt-get -qq clean && sudo -E apt-get -qq autoclean
+        sudo timedatectl set-timezone "$TZ"
+        echo "硬盘详情："
+        df -Th
+
+    - name: 克隆源码
+      working-directory: /workdir
+      run: |
+        df -hT $PWD
+        git clone $REPO_URL -b $REPO_BRANCH openwrt
+        ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
+        cd openwrt
+        useVersionInfo=$(git show -s --date=short --format="Author: %an<br/>date: %cd<br/>commit: %s<br/>commit hash: %H")
+        echo "useVersionInfo=$useVersionInfo" >> $GITHUB_ENV
+        echo "DATE=$(date "+%Y-%m-%d %H:%M:%S")" >> $GITHUB_ENV
+        echo "DATE1=$(date "+%Y-%m-%d")" >> $GITHUB_ENV
+
+    - name: 缓存依赖项
+      uses: actions/cache@v4
+      with:
+        path: |
+          /workdir/openwrt/.ccache
+          /workdir/openwrt/staging_dir
+        key: ${{ runner.os }}-${{ hashFiles('**/repo_flag') }}-${{ env.DATE }}
+        restore-keys: |
+          ${{ runner.os }}-${{ hashFiles('**/repo_flag') }}-
+
+    - name: 刷新缓存
+      run: |
+        if [ -d "/workdir/openwrt/staging_dir" ]; then
+          find "/workdir/openwrt/staging_dir" -type d -name "stamp" -not -path "*target*" | while read -r dir; do
+              find "$dir" -type f -exec touch {} +
+          done
+        fi
+
+    - name: 加载自定义feeds
+      run: |
+        [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
+        chmod +x $DIY_P1_SH
+        cd openwrt
+        $GITHUB_WORKSPACE/$DIY_P1_SH
+
+    - name: 更新feeds
+      run: cd openwrt && ./scripts/feeds update -a
+
+    - name: 安装feeds
+      run: cd openwrt && ./scripts/feeds install -a
+
+    - name: 加载自定义配置
+      run: |
+        [ -e files ] && mv files openwrt/files
+        [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
+        chmod +x $DIY_P2_SH
+        cd openwrt
+        $GITHUB_WORKSPACE/$DIY_P2_SH
+
+    - name: 下载软件包
+      working-directory: ./openwrt
+      run: |
+        make defconfig
+        make download -j$(( $(nproc) * 2 ))
+        find dl -size -1k -exec rm -f {} \;
+
+        
+    - name: 编译固件
+      run: |
+        chmod -R 755 openwrt
+        cd openwrt
+        
+        # 清理可能有问题的包
+        rm -rf feeds/packages/libs/libfido2 2>/dev/null || true
+        sed -i '/libfido2/d' .config 2>/dev/null || true
+        
+        echo -e "$(nproc) thread compile"
+        
+        # 尝试编译，失败时提供详细错误信息
+        if make -j$(( $(nproc) + 1 )) 2>&1 | tee compile.log; then
+          echo "编译成功"
+          echo "status=success" >> $GITHUB_OUTPUT
+        else
+          echo "编译失败，尝试单线程详细模式..."
+          echo "======================="
+          echo "编译错误详情:"
+          echo "======================="
+          tail -50 compile.log
+          echo "======================="
+          if make -j1 V=s 2>&1 | tee compile-verbose.log; then
+            echo "单线程编译成功"
+            echo "status=success" >> $GITHUB_OUTPUT
+          else
+            echo "编译失败，请检查日志"
+            echo "status=failed" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+        fi
+        
+        echo "======================="
+        echo "空间使用情况:"
+        echo "======================="
+        df -h
+        echo "======================="
+        du -h --max-depth=1 ./ --exclude=build_dir --exclude=bin
+        du -h --max-depth=1 ./build_dir
+        du -h --max-depth=1 ./bin
+        rm -rf ./build_dir
+        
+    - name: 清理磁盘空间
+      if: (!cancelled())
+      run: |
+        echo "清理之前："
+        df -hT
+        mkdir -p /workdir/openwrt-armvirt
+        mv openwrt/bin/targets/*/*/*.tar.gz /workdir/openwrt-armvirt/
+        echo -e "\n"
+        echo "列出空间占用前10的目录或文件："
+        sudo du -h --max-depth=1 /workdir/openwrt |sort -nr | head -10
+        rm -rf /workdir/openwrt/*
+        echo -e "\n"
+        echo "清理之后："
+        df -hT
+        echo -e "\n"
+        echo "当前路径文件"
+        ls -l /workdir/
+        echo -e "\n"
+        echo "列出空间占用前10的目录或文件："
+        sudo du -h --max-depth=1 /workdir/openwrt |sort -nr | head -10
+
+    - name: 打包内核
+      uses: unifreq/openwrt_packit@master
+      env:
+        WHOAMI: deng
+        OPENWRT_ARMVIRT: ${{ env.FIRMWARE }}/*.tar.gz
+        PACKAGE_SOC: s905d
+        KERNEL_AUTO_LATEST: true
+        KERNEL_VERSION_NAME: 5.15.105_6.6.1
+        
+    - name: 整理文件
+      run: |
+        mkdir -p /workdir/upload
+        mv /opt/openwrt_packit/output/* /workdir/upload/
+        echo "最终输出文件："
+        ls -la /workdir/upload/
+      
+    - name: 发布固件
+      uses: ncipollo/release-action@v1
+      with:
+        tag: openwrt_armsr_v8_${{ env.PACKAGED_OUTPUTDATE }}
+        artifacts: /workdir/upload/*
+        allowUpdates: true
+        token: ${{ secrets.GB_TOKEN }}
+        body: |
+          ### **适用于Amlogic平台的N1盒子OpenWrt固件--全插件**
+          * **固件信息：**
+          默认IP: `192.168.1.10`
+          默认用户名: `root`
+          默认密码: `password`
+          * **使用方法：**
+          1. 安装固件：写入U盘直接使用；U盘启动后可输入命令 `openwrt-install-amlogic` 按照英文提示写入到emmc
+          2. 更新固件：将固件放在 `/mnt/mmcblk2p4/` 目录下，输入命令 `openwrt-update-amlogic` 可直接更新
+          3. 登录Luci界面后，可直接使用`晶晨宝盒`插件进行写入emmc或者更新操作（使用前先按需求填写好插件设置），免去手动输入命令！
+          * **更新说明：**
+          目前已集成大部分常用插件！
+          * **提示：**
+          `openwrt_s905d_n1_XX_XX` 文件名才是固件！
+
+    - name: 清理Actions空间
+      uses: Mattraks/delete-workflow-runs@main
+      with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          仓库: ${{ github.repository }}
+          keep_minimum_runs: 0
+          retain_days: 7
+          #retain_days: ${{ github.event.inputs.action_days }}
+    
+    - name: 删除多余releases
+      uses: dev-drprasad/delete-older-releases@master
+      with:
+        repo: ${{ github.repository }}
+        keep_latest: 6
+        #keep_latest: ${{ github.event.inputs.rele }}
+        delete_tags: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GB_TOKEN }}
