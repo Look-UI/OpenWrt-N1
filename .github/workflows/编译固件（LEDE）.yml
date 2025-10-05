@@ -261,7 +261,7 @@ jobs:
     - name: 整理文件
       run: |
         mkdir -p /workdir/upload
-        mv /opt/openwrt_packit/output/* /workdir/upload/
+        mv openwrt/bin/targets/*/*/*.tar.gz /workdir/upload/
         echo "最终输出文件："
         ls -la /workdir/upload/
       
