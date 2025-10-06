@@ -194,8 +194,6 @@ CONFIG_PACKAGE_kmod-mt7921e=y
 CONFIG_PACKAGE_mt7921bt-firmware=y
 CONFIG_PACKAGE_mt7922bt-firmware=y
 
-
-
 ### 压缩和打包工具配置
 CONFIG_PACKAGE_gzip=y
 CONFIG_NGINX_HTTP_GZIP=y
@@ -205,3 +203,4 @@ CONFIG_PACKAGE_TAR_GZIP=y
 # 禁用有问题的包
 # CONFIG_PACKAGE_libfido2 is not set
 # CONFIG_PACKAGE_libfido2-dev is not set
+CONFIG_PACKAGE_libudev-zero=y
