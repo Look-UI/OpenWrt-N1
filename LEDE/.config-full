@@ -201,6 +201,6 @@ CONFIG_NGINX_HTTP_GZIP_STATIC=y
 CONFIG_PACKAGE_TAR_GZIP=y
 
 # 禁用有问题的包
-# CONFIG_PACKAGE_libfido2 is not set
-# CONFIG_PACKAGE_libfido2-dev is not set
-CONFIG_PACKAGE_libudev-zero=y
+CONFIG_PACKAGE_libfido2=y
+CONFIG_PACKAGE_libfido2-dev=y
+
