@@ -93,16 +93,6 @@ git clone https://github.com/immortalwrt/homeproxy package/luci-app-homeproxy
 git clone --depth=1 -b lede https://github.com/pymumu/luci-app-smartdns package/luci-app-smartdns
 git clone --depth=1 https://github.com/pymumu/openwrt-smartdns package/smartdns
 
-# 确保smartdns配置正确
-sed -i 's|/etc/smartdns/smartdns.conf|/etc/smartdns/smartdns.conf|g' package/luci-app-smartdns/luasrc/model/cbi/smartdns/smartdns.lua 2>/dev/null || true
-
-# 添加配置说明注释
-echo "# SmartDNS + AdGuard Home 协同配置说明：" >> package/luci-app-smartdns/README.md 2>/dev/null || true
-echo "# 1. SmartDNS 监听端口: 6053 (DNS解析加速)" >> package/luci-app-smartdns/README.md 2>/dev/null || true
-echo "# 2. AdGuard Home 监听端口: 5353 (广告拦截)" >> package/luci-app-smartdns/README.md 2>/dev/null || true
-echo "# 3. 建议配置: AdGuard Home 上游DNS设置为 127.0.0.1:6053" >> package/luci-app-smartdns/README.md 2>/dev/null || true
-echo "# 4. DNSMASQ 上游DNS设置为 127.0.0.1:5353" >> package/luci-app-smartdns/README.md 2>/dev/null || true
-
 # 修复 v2ray-geodata 依赖问题
 rm -rf feeds/packages/net/v2ray-geodata
 rm -rf package/feeds/packages/v2ray-geodata
@@ -135,13 +125,6 @@ sed -i 's|select kmod-oaf|select kmod-oaf \&\& !PACKAGE_kmod-oaf|g' feeds/packag
 sed -i 's|depends on luci-app-passwall|depends on luci-app-passwall \&\& !PACKAGE_luci-app-ssr-plus|g' feeds/small/luci-app-passwall/Makefile 2>/dev/null || true
 sed -i 's|depends on luci-app-ssr-plus|depends on luci-app-ssr-plus \&\& !PACKAGE_luci-app-passwall|g' feeds/small/luci-app-ssr-plus/Makefile 2>/dev/null || true
 
-# 修复 smartdns 与 adguardhome 共存 - 移除冲突限制
-# 注释掉之前的冲突限制，让两个DNS插件可以共存
-# sed -i 's|depends on luci-app-smartdns|depends on luci-app-smartdns \&\& !PACKAGE_luci-app-adguardhome|g' feeds/small/luci-app-smartdns/Makefile 2>/dev/null || true
-# sed -i 's|depends on luci-app-adguardhome|depends on luci-app-adguardhome \&\& !PACKAGE_luci-app-smartdns|g' feeds/small/luci-app-adguardhome/Makefile 2>/dev/null || true
-
-# 确保smartdns相关依赖正确（移除adguardhome限制）
-# sed -i 's|depends on smartdns|depends on smartdns \&\& !PACKAGE_luci-app-adguardhome|g' feeds/small/smartdns/Makefile 2>/dev/null || true
 
 
 # 调整部分插件到nas菜单
