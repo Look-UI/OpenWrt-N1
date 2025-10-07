@@ -206,7 +206,3 @@ find ./ | grep Makefile | grep mosdns | xargs rm -f
 rm -rf feeds/packages/net/mosdns feeds/packages/net/v2ray-geodata
 git clone https://github.com/sbwml/luci-app-mosdns package/mosdns
 git clone https://github.com/sbwml/v2ray-geodata package/geodata
-
-# 修复 libfido2 编译问题
-rm -rf feeds/packages/libs/libfido2
-sed -i '/libfido2/d' .config 2>/dev/null || true
