@@ -30,47 +30,12 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs-on || 'ubuntu-22.04' }}
+    if: github.event.repository.owner.id == github.event.sender.id || ! github.event.sender.id
 
     steps:
-    - name: 创建编译空间挂载点
-      run: |
-        sudo mkdir -p /workdir
-        sudo chown $USER:$GROUPS /workdir
-        
-    - name: 创建虚拟内存
-      run: |
-        # 先清理可能存在的旧swap文件
-        sudo swapoff -a 2>/dev/null || true
-        sudo rm -f /mnt/swapfile /swapfile 2>/dev/null || true
-        
-        # 创建新的swap文件
-        sudo dd if=/dev/zero of=/mnt/swapfile bs=1M count=8192
-        sudo chmod 600 /mnt/swapfile
-        sudo mkswap /mnt/swapfile
-        sudo swapon /mnt/swapfile
-        free -h | grep -i swap
-
-    - name: 创建模拟物理磁盘
-      run: |
-        mnt_size=$(expr $(df -h /mnt | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 1)
-        root_size=$(expr $(df -h / | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 4)
-        sudo truncate -s "${mnt_size}"G /mnt/mnt.img
-        sudo truncate -s "${root_size}"G /root.img
-        sudo losetup /dev/loop6 /mnt/mnt.img
-        sudo losetup /dev/loop7 /root.img
-        sudo pvcreate /dev/loop6
-        sudo pvcreate /dev/loop7
-        sudo vgcreate github /dev/loop6 /dev/loop7
-        sudo lvcreate -n runner -l 100%FREE github
-        sudo mkfs.xfs /dev/github/runner
-        sudo mkdir -p /workdir
-        sudo mount /dev/github/runner /workdir
-        sudo chown -R runner.runner /workdir
-        df -Th
-          
     - name: 检查Actions
-      uses: actions/checkout@v4
+      uses: actions/checkout@main
     
     - name: 检查服务器配置
       run: |
@@ -101,11 +66,11 @@ jobs:
         echo "检查CPU负载："
         uptime
 
-    - name: 初始化编译环境
+     - name: 初始化环境
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
-        # 清理系统资源
+        # docker rmi `docker images -q`
         sudo swapoff -a
         sudo rm -f /swapfile /mnt/swapfile
         sudo docker image prune -a -f
@@ -115,18 +80,51 @@ jobs:
         sudo sed -i '/NVM_DIR/d;/skel/d' /root/{.bashrc,.profile}
         sudo -E apt-get -qq purge azure-cli ghc* zulu* llvm* firefox google* dotnet* powershell openjdk* mongodb* moby* || true
         [[ -n "${AGENT_TOOLSDIRECTORY}" ]] && sudo rm -rf "${AGENT_TOOLSDIRECTORY}"
-        
-        # 安装依赖
         sudo -E apt-get -qq update
+        #sudo -E apt-get -qq install $(cat $GITHUB_WORKSPACE/depends-ubuntu-2204)
         sudo -E apt-get -qq install $(curl -fsSL https://tinyurl.com/ubuntu2204-make-openwrt)
+        #sudo -E apt-get -qq install $(curl -fsSL git.io/depends-ubuntu-2004)
         sudo -E apt-get -qq install libfuse-dev lib32z1-dev libpcre3 libpcre3-dev clang
         sudo -E apt-get -qq autoremove --purge
         sudo -E systemctl daemon-reload
         sudo -E apt-get -qq clean && sudo -E apt-get -qq autoclean
         sudo timedatectl set-timezone "$TZ"
-        echo "硬盘详情："
+        # sudo mkdir -p /builder
+        # sudo chown $USER:$GROUPS /builder
+        echo "status=success" >> ${GITHUB_OUTPUT}
         df -Th
 
+    - name: 创建编译空间挂载点
+      run: |
+        sudo mkdir -p /workdir
+        sudo chown $USER:$GROUPS /workdir
+        
+    - name: 创建虚拟内存
+      run: |
+        sudo dd if=/dev/zero of=/mnt/swapfile bs=1M count=8192
+        sudo chmod 600 /mnt/swapfile
+        sudo mkswap /mnt/swapfile
+        sudo swapon /mnt/swapfile
+        free -h | grep -i swap
+
+    - name: 创建模拟物理磁盘
+      run: |
+        mnt_size=$(expr $(df -h /mnt | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 1)
+        root_size=$(expr $(df -h / | tail -1 | awk '{print $4}' | sed 's/[[:alpha:]]//g' | sed 's/\..*//') - 4)
+        sudo truncate -s "${mnt_size}"G /mnt/mnt.img
+        sudo truncate -s "${root_size}"G /root.img
+        sudo losetup /dev/loop6 /mnt/mnt.img
+        sudo losetup /dev/loop7 /root.img
+        sudo pvcreate /dev/loop6
+        sudo pvcreate /dev/loop7
+        sudo vgcreate github /dev/loop6 /dev/loop7
+        sudo lvcreate -n runner -l 100%FREE github
+        sudo mkfs.xfs /dev/github/runner
+        sudo mkdir -p /builder
+        sudo mount /dev/github/runner /builder
+        sudo chown -R runner.runner /builder
+        df -Th
+  
     - name: 克隆源码
       working-directory: /workdir
       run: |
