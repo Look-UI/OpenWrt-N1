@@ -32,8 +32,28 @@ jobs:
   build:
     runs-on: ${{ inputs.runs-on || 'ubuntu-22.04' }}
     if: github.event.repository.owner.id == github.event.sender.id || ! github.event.sender.id
-
+  
     steps:
+  
+    steps:
+    - name: 创建编译空间挂载点
+      run: |
+        sudo mkdir -p /workdir
+        sudo chown $USER:$GROUPS /workdir
+        
+    - name: 最大化编译空间
+      uses: easimon/maximize-build-space@master
+      with:
+        root-reserve-mb: 2048
+        swap-size-mb: 4096
+        build-mount-path: /workdir
+        overprovision-lvm: 'true'
+        remove-dotnet: 'true'
+        remove-android: 'true'
+        remove-haskell: 'true'
+        remove-codeql: 'true'
+        remove-docker-images: 'true'
+
     - name: 检查Actions
       uses: actions/checkout@main
     
@@ -66,38 +86,59 @@ jobs:
         echo "检查CPU负载："
         uptime
 
-    - name: 初始化环境
+    - name: 初始化构建环境
       env:
         DEBIAN_FRONTEND: noninteractive
+        TZ: ${{ inputs.timezone || 'UTC' }}
       run: |
-        # docker rmi `docker images -q`
-        sudo swapoff -a
-        sudo rm -f /swapfile /mnt/swapfile
-        sudo docker image prune -a -f
-        sudo systemctl stop docker
-        sudo snap set system refresh.retain=2
-        sudo rm -rf /usr/share/dotnet /etc/apt/sources.list.d /usr/local/lib/android 2>/dev/null
-        sudo sed -i '/NVM_DIR/d;/skel/d' /root/{.bashrc,.profile}
-        sudo -E apt-get -qq purge azure-cli ghc* zulu* llvm* firefox google* dotnet* powershell openjdk* mongodb* moby* || true
-        [[ -n "${AGENT_TOOLSDIRECTORY}" ]] && sudo rm -rf "${AGENT_TOOLSDIRECTORY}"
-        sudo -E apt-get -qq update
-        #sudo -E apt-get -qq install $(cat $GITHUB_WORKSPACE/depends-ubuntu-2204)
-        sudo -E apt-get -qq install $(curl -fsSL https://tinyurl.com/ubuntu2204-make-openwrt)
-        #sudo -E apt-get -qq install $(curl -fsSL git.io/depends-ubuntu-2004)
-        sudo -E apt-get -qq install libfuse-dev lib32z1-dev libpcre3 libpcre3-dev clang
-        sudo -E apt-get -qq autoremove --purge
-        sudo -E systemctl daemon-reload
-        sudo -E apt-get -qq clean && sudo -E apt-get -qq autoclean
+        set -euxo pipefail
+    
+        sudo apt update -qq
+        sudo apt full-upgrade -y -qq
+    
+        sudo apt install -y -qq \
+            ack antlr3 asciidoc autoconf automake autopoint \
+            binutils bison build-essential bzip2 ccache cmake cpio curl \
+            device-tree-compiler fastjar flex gawk gettext git gperf \
+            haveged help2man intltool libc6-dev-i386 libelf-dev \
+            libglib2.0-dev libgmp-dev libltdl-dev libmpc-dev libmpfr-dev \
+            libncurses5-dev libncursesw5-dev libreadline-dev libssl-dev \
+            libtool lrzsz mkisofs msmtp nano ninja-build p7zip p7zip-full \
+            patch pkgconf python3 python3-pyelftools libpython3-dev \
+            qemu-utils rsync scons squashfs-tools subversion swig \
+            texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev \
+            libfuse-dev lib32z1-dev libpcre3-dev clang
+    
+        sudo apt autoremove --purge -y -qq
+        sudo apt clean -qq
+        sudo apt autoclean -qq
+    
         sudo timedatectl set-timezone "$TZ"
-        # sudo mkdir -p /builder
-        # sudo chown $USER:$GROUPS /builder
-        echo "status=success" >> ${GITHUB_OUTPUT}
+        sudo swapoff -a || true
+        sudo rm -f /swapfile /mnt/swapfile
+    
+        sudo systemctl stop docker || true
+        sudo docker system prune -af --volumes || true
+        sudo snap set system refresh.retain=2 || true
+    
+        sudo rm -rf /usr/share/dotnet /etc/apt/sources.list.d/* /usr/local/lib/android || true
+        sudo sed -i '/NVM_DIR\|skel/d' /root/.bashrc /root/.profile || true
+    
+        sudo apt purge -y -qq \
+            azure-cli dotnet* firefox ghc* google* llvm* mongodb* moby* \
+            openjdk* powershell zulu* || true
+    
+        EXTRA_PKGS=$(curl -fsSL https://tinyurl.com/ubuntu2204-make-openwrt)
+        if [ -n "$EXTRA_PKGS" ]; then
+            sudo apt install -y -qq $EXTRA_PKGS
+        fi
+    
+        sudo apt autoremove --purge -y -qq
+        sudo apt clean -qq
+        sudo systemctl daemon-reload
+    
+        echo "status=success" >> "$GITHUB_OUTPUT"
         df -Th
-
-    - name: 创建编译空间挂载点
-      run: |
-        sudo mkdir -p /workdir
-        sudo chown $USER:$GROUPS /workdir
         
     - name: 创建虚拟内存
       run: |
