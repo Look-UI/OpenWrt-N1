@@ -10,11 +10,20 @@
 # 优化调整 by https://github.com/quanjindeng/Actions_OpenWrt-Amlogic
 #
 
-name: 编译固件
+name: 编译固件（LEDE）
 
 on:
   repository_dispatch:
   workflow_dispatch:
+    inputs:
+      runs-on:
+        required: true
+        description: Runs on...
+        type: choice
+        default: ubuntu-22.04
+        options:
+          - ubuntu-20.04
+          - ubuntu-22.04
 
   schedule:
     - cron: 0 16 * * 4
@@ -29,13 +38,60 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ${{ inputs.runs-on || 'ubuntu-22.04' }}
+    if: github.event.repository.owner.id == github.event.sender.id || ! github.event.sender.id
 
     steps:
+    - name: 检出
+      uses: actions/checkout@main
+
+    - name: 检查服务器配置
+      run: |
+        echo "警告⚠"
+        echo "若分配的服务器性能不足，务必及时取消，重新运行！"
+        echo "已知编译成功CPU型号：8370C,8171M"
+        echo "已知性能不足CPU型号：8272CL"
+        echo -e "-------------- ------------CPU信息------------------------------------------\n"
+        echo "CPU物理数量:$(cat /proc/cpuinfo| grep "physical id"| sort| uniq| wc -l)"
+        echo -e "CPU核心及版本信息：$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
+        echo "-------------------------------内存信息-------------------------------------------"
+        echo "已安装内存详细信息："
+        sudo lshw -short -C memory | grep GiB
+        echo -e "\n"
+        echo "-----------------------------硬盘信息---------------------------------------------"
+        echo -e  "硬盘数量：$(ls /dev/sd* | grep -v [1-9] | wc -l) \n"
+        echo "硬盘详情："
+        df -Th
+
+    - name: 初始化环境
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        # docker rmi `docker images -q`
+        sudo swapoff -a
+        sudo rm -f /swapfile /mnt/swapfile
+        sudo docker image prune -a -f
+        sudo systemctl stop docker
+        sudo snap set system refresh.retain=2
+        sudo rm -rf /usr/share/dotnet /etc/apt/sources.list.d /usr/local/lib/android 2>/dev/null
+        sudo sed -i '/NVM_DIR/d;/skel/d' /root/{.bashrc,.profile}
+        sudo -E apt-get -qq purge azure-cli ghc* zulu* llvm* firefox google* dotnet* powershell openjdk* mongodb* moby* || true
+        [[ -n "${AGENT_TOOLSDIRECTORY}" ]] && sudo rm -rf "${AGENT_TOOLSDIRECTORY}"
+        sudo -E apt-get -qq update
+        # 使用本地依赖文件
+        sudo -E apt-get -qq install $(cat $GITHUB_WORKSPACE/depends-ubuntu-2204 | grep -E '^\s*[a-zA-Z0-9-]+' | tr '\n' ' ')
+        sudo -E apt-get -qq install libfuse-dev lib32z1-dev libpcre3 libpcre3-dev clang
+        sudo -E apt-get -qq autoremove --purge
+        sudo -E systemctl daemon-reload
+        sudo -E apt-get -qq clean && sudo -E apt-get -qq autoclean
+        sudo timedatectl set-timezone "$TZ"
+        echo "status=success" >> ${GITHUB_OUTPUT}
+        df -Th
+
     - name: 创建编译空间挂载点
       run: |
         sudo mkdir -p /workdir
-        sudo chown $USER:$GROUPS /workdir
+        sudo chown $USER:$USER /workdir
         
     - name: 最大化编译空间
       uses: easimon/maximize-build-space@master
@@ -51,9 +107,6 @@ jobs:
         remove-codeql: 'true'
         remove-docker-images: 'true'
           
-    - name: 检查Actions
-      uses: actions/checkout@v4
-    
     - name: 检查服务器配置
       run: |
         echo "警告⚠"
