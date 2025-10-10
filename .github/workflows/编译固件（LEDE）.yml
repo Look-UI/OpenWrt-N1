@@ -10,23 +10,15 @@
 # 优化调整 by https://github.com/quanjindeng/Actions_OpenWrt-Amlogic
 #
 
-name: 编译固件（LEDE）
+name: 编译固件
 
 on:
   repository_dispatch:
   workflow_dispatch:
-    inputs:
-      runs-on:
-        required: true
-        description: Runs on...
-        type: choice
-        default: ubuntu-22.04
-        options:
-          - ubuntu-20.04
-          - ubuntu-22.04
 
   schedule:
     - cron: 0 16 * * 4
+
 
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
@@ -35,93 +27,19 @@ env:
   CONFIG_FILE: LEDE/.config-full
   DIY_P1_SH: diy-part1.sh
   DIY_P2_SH: LEDE/diy-part2.sh
+  TZ: Asia/Shanghai
+  DATE: ${{ github.run_number }}
 
 jobs:
   build:
-    runs-on: ${{ inputs.runs-on || 'ubuntu-22.04' }}
-    if: github.event.repository.owner.id == github.event.sender.id || ! github.event.sender.id
+    runs-on: ubuntu-22.04
 
     steps:
-    - name: 检出
-      uses: actions/checkout@main
-
-    - name: 检查服务器配置
-      run: |
-        echo "警告⚠"
-        echo "若分配的服务器性能不足，务必及时取消，重新运行！"
-        echo "已知编译成功CPU型号：8370C,8171M"
-        echo "已知性能不足CPU型号：8272CL"
-        echo -e "-------------- ------------CPU信息------------------------------------------\n"
-        echo "CPU物理数量:$(cat /proc/cpuinfo| grep "physical id"| sort| uniq| wc -l)"
-        echo -e "CPU核心及版本信息：$(cat /proc/cpuinfo | grep name | cut -f2 -d: | uniq -c) \n"
-        echo "-------------------------------内存信息-------------------------------------------"
-        echo "已安装内存详细信息："
-        sudo lshw -short -C memory | grep GiB
-        echo -e "\n"
-        echo "-----------------------------硬盘信息---------------------------------------------"
-        echo -e  "硬盘数量：$(ls /dev/sd* | grep -v [1-9] | wc -l) \n"
-        echo "硬盘详情："
-        df -Th
-
-    - name: 初始化构建环境
-      env:
-        DEBIAN_FRONTEND: noninteractive
-        TZ: ${{ inputs.timezone || 'UTC' }}
-      run: |
-        set -euxo pipefail
-    
-        sudo apt update -qq
-        sudo apt full-upgrade -y -qq
-    
-        sudo apt install -y -qq \
-            ack antlr3 asciidoc autoconf automake autopoint \
-            binutils bison build-essential bzip2 ccache cmake cpio curl \
-            device-tree-compiler fastjar flex gawk gettext git gperf \
-            haveged help2man intltool libc6-dev-i386 libelf-dev \
-            libglib2.0-dev libgmp-dev libltdl-dev libmpc-dev libmpfr-dev \
-            libncurses5-dev libncursesw5-dev libreadline-dev libssl-dev \
-            libtool lrzsz mkisofs msmtp nano ninja-build p7zip p7zip-full \
-            patch pkgconf python3 python3-pyelftools libpython3-dev \
-            qemu-utils rsync scons squashfs-tools subversion swig \
-            texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev \
-            libfuse-dev lib32z1-dev libpcre3-dev clang
-    
-        sudo apt autoremove --purge -y -qq
-        sudo apt clean -qq
-        sudo apt autoclean -qq
-    
-        sudo timedatectl set-timezone "$TZ"
-        sudo swapoff -a || true
-        sudo rm -f /swapfile /mnt/swapfile
-    
-        sudo systemctl stop docker || true
-        sudo docker system prune -af --volumes || true
-        sudo snap set system refresh.retain=2 || true
-    
-        sudo rm -rf /usr/share/dotnet /etc/apt/sources.list.d/* /usr/local/lib/android || true
-        sudo sed -i '/NVM_DIR\|skel/d' /root/.bashrc /root/.profile || true
-    
-        sudo apt purge -y -qq \
-            azure-cli dotnet* firefox ghc* google* llvm* mongodb* moby* \
-            openjdk* powershell zulu* || true
-    
-        EXTRA_PKGS=$(curl -fsSL https://tinyurl.com/ubuntu2204-make-openwrt)
-        if [ -n "$EXTRA_PKGS" ]; then
-            sudo apt install -y -qq $EXTRA_PKGS
-        fi
-    
-        sudo apt autoremove --purge -y -qq
-        sudo apt clean -qq
-        sudo systemctl daemon-reload
-    
-        echo "status=success" >> "$GITHUB_OUTPUT"
-        df -Th
-
     - name: 创建编译空间挂载点
       run: |
         sudo mkdir -p /workdir
         sudo chown $USER:$USER /workdir
-        
+
     - name: 最大化编译空间
       uses: easimon/maximize-build-space@master
       with:
@@ -135,7 +53,10 @@ jobs:
         remove-haskell: 'true'
         remove-codeql: 'true'
         remove-docker-images: 'true'
-          
+  
+    - name: 检出
+      uses: actions/checkout@v4
+
     - name: 检查服务器配置
       run: |
         echo "警告⚠"
@@ -154,6 +75,25 @@ jobs:
         echo "硬盘详情："
         df -Th
 
+    - name: 初始化编译环境
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo apt-get update -y
+        sudo apt-get full-upgrade -y
+        sudo apt-get install -y ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential \
+        bzip2 ccache cmake cpio curl device-tree-compiler fastjar flex gawk gettext gcc-multilib g++-multilib \
+        git gperf haveged help2man intltool libc6-dev-i386 libelf-dev libglib2.0-dev libgmp3-dev libltdl-dev \
+        libmpc-dev libmpfr-dev libncurses5-dev libncursesw5-dev libreadline-dev libssl-dev libtool lrzsz \
+        mkisofs msmtp nano ninja-build p7zip p7zip-full patch pkgconf python2.7 python3 python3-pyelftools \
+        libpython3-dev qemu-utils rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip \
+        vim wget xmlto xxd zlib1g-dev
+        sudo -E apt-get -qq autoremove --purge
+        sudo -E apt-get -qq clean
+        sudo timedatectl set-timezone "$TZ"
+        echo "硬盘详情："
+        df -Th
+
     - name: 克隆源码
       working-directory: /workdir
       run: |
@@ -166,7 +106,7 @@ jobs:
         path: |
           /workdir/openwrt/.ccache
           /workdir/openwrt/staging_dir
-        key: ${{ runner.os }}-${{ hashFiles('**/repo_flag') }}-${{ env.DATE }}
+        key: ${{ runner.os }}-${{ hashFiles('**/repo_flag') }}-${{ github.run_id }}
         restore-keys: |
           ${{ runner.os }}-${{ hashFiles('**/repo_flag') }}-
 
@@ -261,7 +201,7 @@ jobs:
     - name: 发布固件
       uses: ncipollo/release-action@v1
       with:
-        tag: openwrt_armvirt_v8_${{ env.PACKAGED_OUTPUTDATE }}
+        tag: openwrt_armvirt_v8_${{ env.FILE_DATE }}
         artifacts: /workdir/upload/*
         allowUpdates: true
         token: ${{ secrets.GITHUB_TOKEN }}
@@ -286,7 +226,7 @@ jobs:
       uses: Mattraks/delete-workflow-runs@main
       with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          仓库: ${{ github.repository }}
+          repository: ${{ github.repository }}
           keep_minimum_runs: 0
           retain_days: 7
           #retain_days: ${{ github.event.inputs.action_days }}
