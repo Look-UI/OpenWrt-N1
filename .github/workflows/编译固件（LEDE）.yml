@@ -30,9 +30,13 @@ env:
   TZ: Asia/Shanghai
   DATE: ${{ github.run_number }}
 
+
 jobs:
   build:
     runs-on: ubuntu-22.04
+    env:
+      WHOAMI: ${{ github.actor }}
+      PACKAGE_SOC: s905d
 
     steps:
     - name: 创建编译空间挂载点
@@ -145,21 +149,22 @@ jobs:
     - name: 打包内核
       uses: ophub/flippy-openwrt-actions@main
       env:
-        WHOAMI: deng
-        OPENWRT_ARMVIRT: openwrt/bin/targets/*/*/*.tar.gz
-        PACKAGE_SOC: s905d
+        WHOAMI: ${{ env.WHOAMI }}
+        PACKAGE_SOC: ${{ env.PACKAGE_SOC }}
+        OPENWRT_ARMVIRT: /workdir/openwrt/bin/targets/*/*/*.tar.gz
+        KERNEL_VERSION_NAME: 5.15.105_6.6.1
        # KERNEL_AUTO_LATEST: false
        # KERNEL_REPO_URL: https://github.com/quanjindeng/Actions_OpenWrt-Amlogic/tree/main/kernel
-        KERNEL_VERSION_NAME: 5.15.105_6.6.1
         
     - name: 整理文件
       run: |
         mkdir -p /workdir/upload
-        cp -r /opt/openwrt_packit/output/deng/s905d/* /workdir/upload/ || {
-          echo "请检查 flippy-action 是否成功打包固件。"
-          ls -lR /opt/openwrt_packit/output/
+        src_path="/opt/openwrt_packit/output/${WHOAMI}/${PACKAGE_SOC}"
+        if [ ! -d "$src_path" ] || [ -z "$(ls -A "$src_path" 2>/dev/null)" ]; then
+          ls -lR /opt/openwrt_packit/output/ || echo "output 目录为空"
           exit 1
-        }
+        fi
+        cp -r "$src_path"/* /workdir/upload/
     
     - name: 发布固件
       uses: ncipollo/release-action@v1
