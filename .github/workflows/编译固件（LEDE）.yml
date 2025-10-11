@@ -56,8 +56,6 @@ jobs:
   
     - name: 检出代码
       uses: actions/checkout@v4
-      with:
-        path: /workdir/repo
 
     - name: 检查服务器配置
       run: |
@@ -112,20 +110,14 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-openwrt-${{ hashFiles('**/repo_flag') }}-
 
-    - name: 刷新缓存
-      run: |
-        if [ -d "/workdir/openwrt/staging_dir" ]; then
-          find "/workdir/openwrt/staging_dir" -type d -name "stamp" -not -path "*target*" | while read -r dir; do
-              find "$dir" -type f -exec touch {} +
-          done
-        fi
 
     - name: 加载自定义feeds
       working-directory: /workdir/openwrt
       run: |
-        [ -e /workdir/repo/feeds.conf ] && cp /workdir/repo/feeds.conf feeds.conf.default
-        chmod +x /workdir/repo/diy-part1.sh
-        /workdir/repo/diy-part1.sh
+        [ -f "$GITHUB_WORKSPACE/LEDE/feeds.conf.default" ] && \
+          cp "$GITHUB_WORKSPACE/LEDE/feeds.conf.default" feeds.conf.default
+        chmod +x "$GITHUB_WORKSPACE/diy-part1.sh"
+        "$GITHUB_WORKSPACE/diy-part1.sh"
 
     - name: 更新feeds
       run: cd /workdir/openwrt && ./scripts/feeds update -a
@@ -135,17 +127,15 @@ jobs:
 
     - name: 加载自定义配置
       run: |
-        [ -d "/workdir/repo/files" ] && cp -r /workdir/repo/files /workdir/openwrt/
-        [ -f "$CONFIG_FILE" ] && cp "$CONFIG_FILE" /workdir/openwrt/.config
-        # 执行 DIY 脚本
-        chmod +x "$DIY_P2_SH"
+        [ -d "$GITHUB_WORKSPACE/files" ] && cp -r "$GITHUB_WORKSPACE/files" /workdir/openwrt/
+        [ -f "$GITHUB_WORKSPACE/LEDE/.config-full" ] && cp "$GITHUB_WORKSPACE/LEDE/.config-full" /workdir/openwrt/.config
+        chmod +x "$GITHUB_WORKSPACE/LEDE/diy-part2.sh"
         cd /workdir/openwrt
-        "$DIY_P2_SH"
+        "$GITHUB_WORKSPACE/LEDE/diy-part2.sh"
 
     - name: 下载软件包
-      id: package
       run: |
-        cd openwrt
+        cd /workdir/openwrt
         make defconfig
         make download -j8
         find dl -size -1024c -exec ls -l {} \;
@@ -154,9 +144,8 @@ jobs:
         df -Th
 
     - name: 编译固件
-      id: compile
       run: |
-        cd openwrt
+        cd /workdir/openwrt
         echo -e "$(nproc) thread compile"
         make -j$(nproc) V=s
         echo "status=success" >> $GITHUB_OUTPUT
