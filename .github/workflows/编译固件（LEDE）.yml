@@ -93,23 +93,12 @@ jobs:
         sudo timedatectl set-timezone "$TZ"
         echo "硬盘详情："
         df -Th
-
+  
     - name: 克隆源码
       working-directory: /workdir
       run: |
         git clone $REPO_URL -b $REPO_BRANCH openwrt
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
-
-    - name: 缓存依赖项
-      uses: actions/cache@v4
-      with:
-        path: |
-          /workdir/openwrt/.ccache
-          /workdir/openwrt/dl
-        key: ${{ runner.os }}-openwrt-${{ hashFiles('**/repo_flag') }}-${{ github.run_id }}
-        restore-keys: |
-          ${{ runner.os }}-openwrt-${{ hashFiles('**/repo_flag') }}-
-
 
     - name: 加载自定义feeds
       working-directory: /workdir/openwrt
