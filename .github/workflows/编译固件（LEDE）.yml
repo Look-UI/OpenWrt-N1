@@ -146,12 +146,36 @@ jobs:
         [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
         echo "FILE_DATE=_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
 
+    - name: 清理磁盘空间
+      if: (!cancelled())
+      run: |
+        echo "清理之前："
+        df -hT
+        mkdir openwrt-armvirt
+        mkdir -p /workdir/upload
+        # 使用绝对路径操作，避免软链接解析问题
+        cp /workdir/openwrt/bin/targets/*/*/*.tar.gz /workdir/upload/
+        mv /workdir/openwrt/bin/targets/*/*/*.tar.gz openwrt-armvirt/
+        echo -e "\n"
+        echo "列出空间占用前10的目录或文件："
+        sudo du -h --max-depth=1 /workdir | sort -nr | head -10
+        rm -rf /workdir/openwrt/ && sync
+        echo -e "\n"
+        echo "清理之后："
+        df -hT
+        echo -e "\n"
+        echo "/workdir路径文件"
+        ls -l /workdir/
+        echo -e "\n"
+        echo "列出空间占用前10的目录或文件："
+        sudo du -h --max-depth=1 /workdir | sort -nr | head -10
+
     - name: 打包内核
       uses: ophub/flippy-openwrt-actions@main
       env:
         WHOAMI: ${{ env.WHOAMI }}
         PACKAGE_SOC: ${{ env.PACKAGE_SOC }}
-        OPENWRT_ARMVIRT: /workdir/openwrt/bin/targets/*/*/*.tar.gz
+        OPENWRT_ARMVIRT: ${{ github.workspace }}/openwrt-armvirt/*.tar.gz
         KERNEL_VERSION_NAME: 5.15.105_6.6.1
        # KERNEL_AUTO_LATEST: false
        # KERNEL_REPO_URL: https://github.com/quanjindeng/Actions_OpenWrt-Amlogic/tree/main/kernel
