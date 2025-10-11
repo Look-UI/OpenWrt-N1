@@ -162,42 +162,25 @@ jobs:
         [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
         echo "FILE_DATE=_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
 
-    - name: 清理磁盘空间
-      if: (!cancelled())
-      run: |
-        echo "清理之前："
-        df -hT
-        mkdir openwrt-armvirt
-        mkdir /workdir/upload
-        cp openwrt/bin/targets/*/*/*.tar.gz /workdir/upload/
-        mv openwrt/bin/targets/*/*/*.tar.gz openwrt-armvirt/
-        echo -e "\n"
-        echo "列出空间占用前10的目录或文件："
-        sudo du -h --max-depth=1 /workdir |sort -nr | head -10
-        rm -rf /workdir/openwrt/ && sync
-        echo -e "\n"
-        echo "清理之后："
-        df -hT
-        echo -e "\n"
-        echo "/workdir路径文件"
-        ls -l
-        echo -e "\n"
-        echo "列出空间占用前10的目录或文件："
-        sudo du -h --max-depth=1 /workdir |sort -nr | head -10
-
     - name: 打包内核
-      uses: unifreq/openwrt_packit@master
+      uses: ophub/flippy-openwrt-actions@main
       env:
         WHOAMI: deng
-        OPENWRT_ARMVIRT: openwrt-armvirt/*.tar.gz
+        OPENWRT_ARMVIRT: openwrt/bin/targets/*/*/*.tar.gz
         PACKAGE_SOC: s905d
        # KERNEL_AUTO_LATEST: false
        # KERNEL_REPO_URL: https://github.com/quanjindeng/Actions_OpenWrt-Amlogic/tree/main/kernel
         KERNEL_VERSION_NAME: 5.15.105_6.6.1
         
     - name: 整理文件
-      run: mv /opt/openwrt_packit/output/* /workdir/upload/
-      
+      run: |
+        mkdir -p /workdir/upload
+        cp -r /opt/openwrt_packit/output/deng/s905d/* /workdir/upload/ || {
+          echo "请检查 flippy-action 是否成功打包固件。"
+          ls -lR /opt/openwrt_packit/output/
+          exit 1
+        }
+    
     - name: 发布固件
       uses: ncipollo/release-action@v1
       with:
