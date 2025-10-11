@@ -22,7 +22,7 @@ on:
 
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
-  REPO_BRANCH: master
+  REPO_BRANCH: main
   FEEDS_CONF: LEDE/feeds.conf.default
   CONFIG_FILE: LEDE/.config-full
   DIY_P1_SH: diy-part1.sh
@@ -54,8 +54,10 @@ jobs:
         remove-codeql: 'true'
         remove-docker-images: 'true'
   
-    - name: 检出
+    - name: 检出代码
       uses: actions/checkout@v4
+      with:
+        path: /workdir/repo
 
     - name: 检查服务器配置
       run: |
@@ -105,10 +107,10 @@ jobs:
       with:
         path: |
           /workdir/openwrt/.ccache
-          /workdir/openwrt/staging_dir
-        key: ${{ runner.os }}-${{ hashFiles('**/repo_flag') }}-${{ github.run_id }}
+          /workdir/openwrt/dl
+        key: ${{ runner.os }}-openwrt-${{ hashFiles('**/repo_flag') }}-${{ github.run_id }}
         restore-keys: |
-          ${{ runner.os }}-${{ hashFiles('**/repo_flag') }}-
+          ${{ runner.os }}-openwrt-${{ hashFiles('**/repo_flag') }}-
 
     - name: 刷新缓存
       run: |
@@ -119,25 +121,26 @@ jobs:
         fi
 
     - name: 加载自定义feeds
+      working-directory: /workdir/openwrt
       run: |
-        [ -e $FEEDS_CONF ] && mv $FEEDS_CONF openwrt/feeds.conf.default
-        chmod +x $DIY_P1_SH
-        cd openwrt
-        $GITHUB_WORKSPACE/$DIY_P1_SH
+        [ -e /workdir/repo/feeds.conf ] && cp /workdir/repo/feeds.conf feeds.conf.default
+        chmod +x /workdir/repo/diy-part1.sh
+        /workdir/repo/diy-part1.sh
 
     - name: 更新feeds
-      run: cd openwrt && ./scripts/feeds update -a
-
+      run: cd /workdir/openwrt && ./scripts/feeds update -a
+    
     - name: 安装feeds
-      run: cd openwrt && ./scripts/feeds install -a
+      run: cd /workdir/openwrt && ./scripts/feeds install -a
 
     - name: 加载自定义配置
       run: |
-        [ -e files ] && mv files openwrt/files
-        [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
-        chmod +x $DIY_P2_SH
-        cd openwrt
-        $GITHUB_WORKSPACE/$DIY_P2_SH
+        [ -d "/workdir/repo/files" ] && cp -r /workdir/repo/files /workdir/openwrt/
+        [ -f "$CONFIG_FILE" ] && cp "$CONFIG_FILE" /workdir/openwrt/.config
+        # 执行 DIY 脚本
+        chmod +x "$DIY_P2_SH"
+        cd /workdir/openwrt
+        "$DIY_P2_SH"
 
     - name: 下载软件包
       id: package
@@ -153,10 +156,9 @@ jobs:
     - name: 编译固件
       id: compile
       run: |
-        chmod -R 755 openwrt
         cd openwrt
         echo -e "$(nproc) thread compile"
-        make -j$(nproc) || make -j1 || make -j1 V=s
+        make -j$(nproc) V=s
         echo "status=success" >> $GITHUB_OUTPUT
         grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
         [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
