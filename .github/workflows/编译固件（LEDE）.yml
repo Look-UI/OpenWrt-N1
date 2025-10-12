@@ -183,9 +183,9 @@ jobs:
     - name: 整理文件
       run: |
         mkdir -p /workdir/upload
-        src_path="/opt/openwrt_packit/output/${WHOAMI}/${PACKAGE_SOC}"
+        src_path="/opt/openwrt_packit/output"
         if [ ! -d "$src_path" ] || [ -z "$(ls -A "$src_path" 2>/dev/null)" ]; then
-          ls -lR /opt/openwrt_packit/output/ || echo "output 目录为空"
+          ls -lR /opt/openwrt_packit/ || true
           exit 1
         fi
         cp -r "$src_path"/* /workdir/upload/
