@@ -214,21 +214,27 @@ jobs:
         allowUpdates: true
         token: ${{ secrets.GITHUB_TOKEN }}
         body: |
-          ### **适用于Amlogic平台的N1盒子OpenWrt固件--全插件**
-          * **固件信息：**
-          默认IP: `192.168.1.10`
-          默认用户名: `root`
-          默认密码: `password`
-          * **使用方法：**
-          1. 安装固件：写入U盘直接使用；U盘启动后可输入命令 `openwrt-install-amlogic` 按照英文提示写入到emmc
-          2. 更新固件：将固件放在 `/mnt/mmcblk2p4/` 目录下，输入命令 `openwrt-update-amlogic` 可直接更新
-          3. 登录Luci界面后，可直接使用`晶晨宝盒`插件进行写入emmc或者更新操作（使用前先按需求填写好插件设置），免去手动输入命令！
-          * **更新说明：**
-          目前已集成大部分常用插件！
-          * **N1云编译OP固件互助交流群：**
-          https://t.me/OpenWrt_n1
-          * **提示：**
-          `openwrt_s905d_n1_XX_XX` 文件名才是固件！
+          # 🚀 OpenWrt固件发布 - N1盒子专用
+          
+          ## 📋 固件信息
+          - **默认IP地址**: `192.168.1.10`
+          - **默认用户名**: `root`
+          - **默认密码**: `password`
+          - **适用平台**: Amlogic S905D (N1盒子)
+          
+          ## 🛠️ 安装与更新
+          **U盘安装**: 写入U盘启动 → 执行 `openwrt-install-amlogic` → 按提示完成eMMC写入
+          
+          **Web界面**: 登录Luci → 使用"晶晨宝盒"插件 → 一键安装/更新
+          
+          **固件更新**: 将固件放入 `/mnt/mmcblk2p4/` → 执行 `openwrt-update-amlogic`
+          
+          ## ✨ 功能特色
+          ✅ 集成常用插件 | ✅ 一键eMMC安装 | ✅ 在线更新 | ✅ N1性能优化
+          
+          ## ⚠️ 重要提示
+          - 固件文件名：`openwrt_s905d_n1_XX_XX`
+          - 确保N1盒子型号匹配，建议首次使用前备份原系统
 
 
 
