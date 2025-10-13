@@ -5,11 +5,9 @@
 
 ## 特性
 
-- 🚀 **一键编译**: 使用GitHub Actions自动编译OpenWrt固件
-- 📦 **多版本支持**: 支持LEDE、immortalwrt、iStore等多个版本
-- 🔧 **内核打包**: 集成flippy内核打包脚本，生成完整固件
-- 📱 **N1优化**: 专门针对N1盒子进行优化配置
-- 🔄 **自动发布**: 编译完成后自动发布到Releases
+- **一键编译**: 使用GitHub Actions自动编译OpenWrt固件
+- **多版本支持**: 支持LEDE、immortalwrt、iStore等多个版本
+- **内核打包**: 集成flippy内核打包脚本，生成完整固件
 
 ## 使用方法
 
