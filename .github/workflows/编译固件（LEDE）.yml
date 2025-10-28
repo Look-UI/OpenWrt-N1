@@ -131,7 +131,7 @@ jobs:
     - name: 加载自定义配置
       run: |
         [ -d "$GITHUB_WORKSPACE/files" ] && cp -r "$GITHUB_WORKSPACE/files" /workdir/openwrt/
-        [ -f "$GITHUB_WORKSPACE/LEDE/.config-full" ] && cp "$GITHUB_WORKSPACE/LEDE/.config-lede" /workdir/openwrt/.config
+        [ -f "$GITHUB_WORKSPACE/LEDE/.config-lede" ] && cp "$GITHUB_WORKSPACE/LEDE/.config-lede" /workdir/openwrt/.config
         chmod +x "$GITHUB_WORKSPACE/LEDE/diy-part2.sh"
         cd /workdir/openwrt
         "$GITHUB_WORKSPACE/LEDE/diy-part2.sh"
